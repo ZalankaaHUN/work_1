@@ -1013,6 +1013,32 @@
   spineScroll(); window.addEventListener("scroll", spineScroll, {passive:true});
   window.addEventListener("resize", spineScroll, {passive:true});
 
+  /* ---------- spine-nav scrub suppression ----------
+     Jumping between sections via the right-side spine often has to glide straight
+     through the tall proof scroll-track. Left alone, the regular scroll listener
+     would catch every frame of that transit and play the build animation along
+     the way, making the jump feel janky instead of smooth. While a spine click is
+     in flight we pause that listener, then resync it once the scroll settles —
+     normal mouse/trackpad scrolling through the proof section is untouched. */
+  var spineNavActive = false, spineNavTimer = null;
+  function spineNavSettle(){
+    spineNavActive = false;
+    scrubUpdate();
+  }
+  function spineNavWatch(){
+    if(!spineNavActive) return;
+    clearTimeout(spineNavTimer);
+    spineNavTimer = setTimeout(spineNavSettle, 140);
+  }
+  window.addEventListener("scroll", spineNavWatch, {passive:true});
+  spineLinks.forEach(function(a){
+    a.addEventListener("click", function(){
+      spineNavActive = true;
+      clearTimeout(spineNavTimer);
+      spineNavTimer = setTimeout(spineNavSettle, 140);
+    });
+  });
+
   /* ---------- magnetic buttons (fine pointers only, motion respected) ---------- */
   if(window.matchMedia("(pointer:fine)").matches && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){
     document.querySelectorAll(".btn").forEach(function(b){
@@ -1053,6 +1079,7 @@
 
   /* scrub mode: map track scroll progress (0–1) to cumulative stages, both directions */
   function scrubUpdate(){
+    if(spineNavActive) return;
     if(!isScrub() || !proofSec || document.body.classList.contains("show-start")) return;
     var r = proofTrack.getBoundingClientRect();
     var total = r.height - window.innerHeight;
