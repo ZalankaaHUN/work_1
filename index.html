@@ -315,7 +315,9 @@
   /* ===== proof — live build demo ===== */
   .proof-grid{ display:grid; grid-template-columns:.9fr 1.1fr; gap:60px; align-items:center; }
   .proof-steps{ list-style:none; margin-top:34px; border-top:1px solid var(--line); }
-  .proof-steps li{ display:flex; align-items:center; gap:14px; padding:13px 0; border-bottom:1px solid var(--line); color:var(--stone); font-size:.95rem; transition:color .4s var(--ease),padding-left .4s var(--ease); }
+  .proof-steps li{ display:flex; align-items:center; gap:14px; padding:13px 0; border-bottom:1px solid var(--line); color:var(--stone); font-size:.95rem; transition:color .4s var(--ease),padding-left .4s var(--ease); cursor:pointer; }
+  .proof-steps li:hover{ color:var(--ink-soft); }
+  .proof-steps li:focus-visible{ outline:2px solid var(--moss); outline-offset:3px; border-radius:4px; }
   .proof-steps .ps-num{ font-family:var(--mono); font-size:.64rem; letter-spacing:.14em; }
   .proof-steps li i{ width:7px; height:7px; border-radius:50%; border:1px solid var(--stone-soft); flex:none; margin-left:auto; transition:.4s var(--ease); }
   .proof-steps li.on{ color:var(--ink); padding-left:6px; }
@@ -472,22 +474,22 @@
   <div class="wrap hero-inner">
     <span class="mono eyebrow reveal-load d1" data-bp="eyebrow · JetBrains Mono · letter-spacing .22em" data-i18n="hero.eyebrow">Design, build, launch &mdash; all of it</span>
     <h1 class="reveal-load d2" data-bp="h1 · Fraunces 400 · clamp(2.9rem, 7.4vw, 6rem)" data-i18n="hero.h1">Built with you.<br>Handled by <em>us</em>.</h1>
-    <p class="lead reveal-load d3" data-bp="lead · Hanken Grotesk 300 · max-width 560px" data-i18n="hero.lead">Website builders hand you the work. Agencies take the brief and disappear. We do the whole thing &mdash; design, build, launch, your domain, even your business email &mdash; and keep you in on every decision without burying you in the work.</p>
+    <p class="lead reveal-load d3" data-bp="lead · Hanken Grotesk 300 · max-width 560px" data-i18n="hero.lead">Website builders leave the execution to you. Agencies take a brief and step away until delivery. We work differently &mdash; design, development and launch handled together, including your domain and business email, with you involved in every decision along the way.</p>
     <div class="hero-cta reveal-load d4">
       <a class="btn" data-go="start">
         <span data-i18n="hero.cta1">Start a project</span>
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <a href="#approach" class="btn ghost" data-i18n="hero.cta2">See how it works</a>
-      <span class="mono hero-meta" data-i18n="hero.meta">Est. 2025 &mdash; Worldwide</span>
+      <span class="mono hero-meta" data-i18n="hero.meta">Established 2025 &mdash; Worldwide</span>
     </div>
   </div>
 </section>
 
 <div class="marquee reveal-load d5" aria-hidden="true" data-bp="marquee · 34s linear loop · pauses on hover">
   <div class="marquee-track">
-    <span data-i18n="m.strategy">Strategy</span><span data-i18n="m.systems">Design</span><span data-i18n="m.frontend">Hand-built code</span><span data-i18n="m.motion">Domain &amp; email setup</span><span data-i18n="m.perf">Launch &amp; hosting</span><span data-i18n="m.seo">SEO foundations</span><span data-i18n="m.builds">Ongoing care</span><span data-i18n="m.maint">Always in the loop</span>
-    <span data-i18n="m.strategy">Strategy</span><span data-i18n="m.systems">Design</span><span data-i18n="m.frontend">Hand-built code</span><span data-i18n="m.motion">Domain &amp; email setup</span><span data-i18n="m.perf">Launch &amp; hosting</span><span data-i18n="m.seo">SEO foundations</span><span data-i18n="m.builds">Ongoing care</span><span data-i18n="m.maint">Always in the loop</span>
+    <span data-i18n="m.strategy">Strategy</span><span data-i18n="m.systems">Design</span><span data-i18n="m.frontend">Hand-built code</span><span data-i18n="m.motion">Domain &amp; email setup</span><span data-i18n="m.perf">Launch &amp; hosting</span><span data-i18n="m.seo">Search engine optimization</span><span data-i18n="m.builds">Ongoing care</span><span data-i18n="m.maint">Always in the loop</span>
+    <span data-i18n="m.strategy">Strategy</span><span data-i18n="m.systems">Design</span><span data-i18n="m.frontend">Hand-built code</span><span data-i18n="m.motion">Domain &amp; email setup</span><span data-i18n="m.perf">Launch &amp; hosting</span><span data-i18n="m.seo">Search engine optimization</span><span data-i18n="m.builds">Ongoing care</span><span data-i18n="m.maint">Always in the loop</span>
   </div>
 </div>
 
@@ -496,25 +498,25 @@
     <div class="sec-head reveal">
       <span class="mono eyebrow" data-i18n="approach.eyebrow">What we do</span>
       <h2 data-i18n="approach.h2">Everything it takes,<br>under <em>one roof</em>.</h2>
-      <p data-i18n="approach.p">No handing you a pile of logins and wishing you luck. From the first conversation to the live site, it&rsquo;s all us &mdash; and you&rsquo;re in on all of it.</p>
+      <p data-i18n="approach.p">We won&rsquo;t hand you a list of logins and leave you to manage it. From the first conversation through to the live site, we handle it all &mdash; and you&rsquo;re kept informed at every stage.</p>
     </div>
     <div class="services" data-bp="grid · repeat(3, 1fr) · 1px shared rules">
       <div class="svc reveal">
         <span class="mono num">01</span><span class="arrow" aria-hidden="true">↗</span>
         <h3 data-i18n="svc1.title">Design</h3>
-        <p data-i18n="svc1.p">The look, feel and structure of your site, shaped around your business &mdash; brand direction, layout, the whole visual system. Designed for you, never pulled off a shelf.</p>
+        <p data-i18n="svc1.p">The way your site looks, feels and fits together &mdash; shaped around your business rather than a standard template. Brand direction, structure, and the complete visual system, designed specifically for you.</p>
         <ul><li data-i18n="svc1.l1">Brand &amp; visual direction</li><li data-i18n="svc1.l2">Layout &amp; design systems</li><li data-i18n="svc1.l3">No templates, ever</li></ul>
       </div>
       <div class="svc reveal">
         <span class="mono num">02</span><span class="arrow" aria-hidden="true">↗</span>
         <h3 data-i18n="svc2.title">Build</h3>
-        <p data-i18n="svc2.p">Hand-written code that loads fast and ages well &mdash; plus everything other studios leave to you. Domain, hosting, business email, the whole technical setup: handled. You never touch a dashboard or a DNS record.</p>
-        <ul><li data-i18n="svc2.l1">Custom frontends</li><li data-i18n="svc2.l2">Domain, email &amp; hosting</li><li data-i18n="svc2.l3">Performance &amp; SEO</li></ul>
+        <p data-i18n="svc2.p">Hand-written code that loads quickly and remains reliable over time &mdash; along with everything other studios typically leave for you to manage. Domain, hosting and business email are all included, so you won&rsquo;t need to configure any technical settings yourself.</p>
+        <ul><li data-i18n="svc2.l1">Custom frontends</li><li data-i18n="svc2.l2">Domain, email &amp; hosting</li><li data-i18n="svc2.l3">Performance &amp; search engine optimization</li></ul>
       </div>
       <div class="svc reveal">
         <span class="mono num">03</span><span class="arrow" aria-hidden="true">↗</span>
         <h3 data-i18n="svc3.title">Maintain</h3>
-        <p data-i18n="svc3.p">Launch isn&rsquo;t the finish line. We stay on as your technical partner &mdash; keeping the site fast, secure and current with updates, fixes and improvements as your business grows.</p>
+        <p data-i18n="svc3.p">Launch is not where our involvement ends. We remain your technical partner, keeping your site fast, secure and up to date with improvements as your business grows.</p>
         <ul><li data-i18n="svc3.l1">Ongoing support</li><li data-i18n="svc3.l2">Updates &amp; iteration</li><li data-i18n="svc3.l3">One point of contact</li></ul>
       </div>
     </div>
@@ -525,7 +527,7 @@
   <div class="wrap advisor-inner reveal">
     <span class="mono eyebrow" data-i18n="adv.eyebrow">No brief? No problem</span>
     <h2 data-i18n="adv.h2">No clear idea yet?<br>That&rsquo;s <em>the point of us</em>.</h2>
-    <p data-i18n="adv.p">Plenty of people come to us with nothing but a hunch and a business they care about. That&rsquo;s exactly where we do our best work &mdash; asking the right questions, showing you the options, and turning &lsquo;I&rsquo;m not sure&rsquo; into something that feels obviously right.</p>
+    <p data-i18n="adv.p">Many clients come to us with little more than an idea and a business they care about. That is where we do our best work &mdash; asking the right questions, presenting clear options, and turning uncertainty into a confident direction.</p>
   </div>
 </section>
 
@@ -541,11 +543,11 @@
               <p data-i18n="demo.p">Our process, compressed into a few seconds. Wireframe to live, every layer in order &mdash; built right here in front of you, the same way we&rsquo;d build yours.</p>
             </div>
             <ol class="proof-steps" id="proofSteps">
-              <li><span class="ps-num">01</span><span data-i18n="demo.s1">Wireframe</span><i aria-hidden="true"></i></li>
-              <li><span class="ps-num">02</span><span data-i18n="demo.s2">Type</span><i aria-hidden="true"></i></li>
-              <li><span class="ps-num">03</span><span data-i18n="demo.s3">Colour</span><i aria-hidden="true"></i></li>
-              <li><span class="ps-num">04</span><span data-i18n="demo.s4">Content</span><i aria-hidden="true"></i></li>
-              <li><span class="ps-num">05</span><span data-i18n="demo.s5">Launch</span><i aria-hidden="true"></i></li>
+              <li data-stage="1" role="button" tabindex="0"><span class="ps-num">01</span><span data-i18n="demo.s1">Wireframe</span><i aria-hidden="true"></i></li>
+              <li data-stage="2" role="button" tabindex="0"><span class="ps-num">02</span><span data-i18n="demo.s2">Type</span><i aria-hidden="true"></i></li>
+              <li data-stage="3" role="button" tabindex="0"><span class="ps-num">03</span><span data-i18n="demo.s3">Colour</span><i aria-hidden="true"></i></li>
+              <li data-stage="4" role="button" tabindex="0"><span class="ps-num">04</span><span data-i18n="demo.s4">Content</span><i aria-hidden="true"></i></li>
+              <li data-stage="5" role="button" tabindex="0"><span class="ps-num">05</span><span data-i18n="demo.s5">Launch</span><i aria-hidden="true"></i></li>
             </ol>
             <button class="btn ghost" id="replayBtn" type="button"><span data-i18n="demo.replay">Play it again</span></button>
             <div class="scrub-hint mono" aria-hidden="true">
@@ -604,13 +606,13 @@
     <div class="sec-head reveal">
       <span class="mono eyebrow" data-i18n="process.eyebrow">How we work</span>
       <h2 data-i18n="process.h2">We build in <em>layers</em>.</h2>
-      <p data-i18n="process.p">You&rsquo;ll always know where things stand &mdash; no black box, no radio silence. Here&rsquo;s how a project moves.</p>
+      <p data-i18n="process.p">You will always know where the project stands &mdash; no black box, and no long silences. Here is how a project moves forward.</p>
     </div>
     <div class="strata" data-bp="strata · staggered scroll reveals">
-      <div class="layer reveal"><span class="lnum">01</span><div><h3 data-i18n="layer1.title">Foundation</h3><p data-i18n="layer1.p">We start by understanding you &mdash; your goals, your customers, what &lsquo;done right&rsquo; actually means to you. Nothing gets built until we&rsquo;re aligned.</p></div><span class="lmeta" data-i18n="layer1.meta">Discovery</span></div>
+      <div class="layer reveal"><span class="lnum">01</span><div><h3 data-i18n="layer1.title">Foundation</h3><p data-i18n="layer1.p">We begin by getting to know you &mdash; your goals, your customers, and what success genuinely looks like for you. Nothing is built until we are fully aligned.</p></div><span class="lmeta" data-i18n="layer1.meta">Discovery</span></div>
       <div class="layer reveal"><span class="lnum">02</span><div><h3 data-i18n="layer2.title">Structure</h3><p data-i18n="layer2.p">We map the whole thing out &mdash; pages, flow, structure &mdash; and agree on it together before a pixel is designed.</p></div><span class="lmeta" data-i18n="layer2.meta">Architecture</span></div>
       <div class="layer reveal"><span class="lnum">03</span><div><h3 data-i18n="layer3.title">Surface</h3><p data-i18n="layer3.p">Your site comes to life in hand-built code, shared with you as it grows. You see it take shape, not just the final reveal.</p></div><span class="lmeta" data-i18n="layer3.meta">Design + Build</span></div>
-      <div class="layer reveal"><span class="lnum">04</span><div><h3 data-i18n="layer4.title">Launch</h3><p data-i18n="layer4.p">We handle the entire go-live &mdash; domain, email, hosting, the lot. You just watch it appear. Then we stick around.</p></div><span class="lmeta" data-i18n="layer4.meta">Ship + Care</span></div>
+      <div class="layer reveal"><span class="lnum">04</span><div><h3 data-i18n="layer4.title">Launch</h3><p data-i18n="layer4.p">We manage the entire launch &mdash; domain, email, hosting and everything in between. You simply watch it go live, and we remain involved afterward.</p></div><span class="lmeta" data-i18n="layer4.meta">Ship + Care</span></div>
     </div>
   </div>
 </section>
@@ -620,7 +622,7 @@
     <div class="sec-head reveal">
       <span class="mono eyebrow" data-i18n="studio.eyebrow">The studio</span>
       <h2 data-i18n="studio.h2">Small by <em>design</em>.</h2>
-      <p data-i18n="studio.p">Webstrakt is two people who&rsquo;d rather do a handful of things exceptionally than everything adequately. You talk to the people doing the work &mdash; always.</p>
+      <p data-i18n="studio.p">Webstrakt is two people who would rather do a few things exceptionally well than many things adequately. You always work directly with the people doing the work.</p>
     </div>
     <div class="stats" data-bp="grid · repeat(4, 1fr) · counters animate in view">
       <div class="stat reveal"><div class="big" data-count="100" data-suffix="%">0%</div><div class="lab" data-i18n="stat1.lab">Custom-built, zero templates</div></div>
@@ -636,7 +638,7 @@
   <div class="topo"></div>
   <div class="wrap cta-inner reveal">
     <h2 data-bp="h2 · Fraunces · italic accent in moss" data-i18n="cta.h2">Let&rsquo;s build something <em>that&rsquo;s yours</em>.</h2>
-    <p data-i18n="cta.p">Tell us what you&rsquo;re picturing &mdash; or just what you&rsquo;re stuck on. We&rsquo;ll take it from there.</p>
+    <p data-i18n="cta.p">Tell us what you have in mind &mdash; or simply where you feel stuck. We will take it from there.</p>
     <a class="btn" data-go="start">
       <span data-i18n="cta.btn">Start a project</span>
       <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -657,7 +659,7 @@
           </svg>
           Webstrakt
         </a>
-        <p data-i18n="foot.tagline">A two-person studio that designs, builds, and handles everything after &mdash; so your website just works.</p>
+        <p data-i18n="foot.tagline">A two-person studio that designs, builds, and manages everything afterward &mdash; so your website simply works.</p>
       </div>
       <div class="foot-col">
         <h4 data-i18n="foot.menu">Menu</h4>
@@ -693,7 +695,7 @@
         <div class="intro">
           <span class="mono eyebrow" data-i18n="form.eyebrow">Start a project</span>
           <h1 data-i18n="form.h1">Tell us about your <em>project</em>.</h1>
-          <p data-i18n="form.lead">Fill in a few details and we&rsquo;ll get back to you within two business days. The more you share, the sharper our first reply.</p>
+          <p data-i18n="form.lead">Share a few details, and we will respond within two business days. The more context you provide, the more focused our first reply will be.</p>
           <div class="detail">
             <span class="mono" data-i18n="form.prefer">Prefer email?</span>
             <a href="mailto:hello@webstrakt.com">hello@webstrakt.com</a>
@@ -759,36 +761,36 @@
     "nav.cta":{en:"Start a project",hu:"Projekt indítása"},
     "hero.eyebrow":{en:"Design, build, launch &mdash; all of it",hu:"Tervezés, fejlesztés, indítás &mdash; az egész"},
     "hero.h1":{en:"Built with you.<br>Handled by <em>us</em>.",hu:"Veled együtt építjük.<br>A többit <em>ránk bízhatod</em>."},
-    "hero.lead":{en:"DIY website builders leave you to figure it out alone. Agencies take your brief and vanish for weeks. We&rsquo;d rather just build it with you &mdash; design, code, launch, your domain, even your business email &mdash; checking in at every step so you&rsquo;re never left wondering what&rsquo;s happening.",hu:"A weboldal-építők rád hagyják, hogy boldogulj egyedül. Az ügynökségek elveszik a feladatot, aztán hetekre eltűnnek. Mi inkább veled együtt építjük fel &mdash; tervezés, kódolás, indítás, a domain, sőt a céges e-mail is &mdash;, és minden lépésnél jelzünk, hogy sose maradj kérdések nélkül."},
+    "hero.lead":{en:"Website builders leave the execution to you. Agencies take a brief and step away until delivery. We work differently &mdash; design, development and launch handled together, including your domain and business email, with you involved in every decision along the way.",hu:"A weboldal-építők rád hagyják a megvalósítást. Az ügynökségek átveszik a briefet, és csak az átadásnál jelentkeznek újra. Mi másképp dolgozunk &mdash; a tervezést, a fejlesztést és az indítást együtt kezeljük, a domainnel és a céges e-mail-fiókkal együtt, és minden döntésbe bevonunk."},
     "hero.cta1":{en:"Start a project",hu:"Projekt indítása"},
     "hero.cta2":{en:"See how it works",hu:"Hogyan működik"},
-    "hero.meta":{en:"Est. 2025 &mdash; Worldwide",hu:"Alapítva 2025 &mdash; Világszerte"},
+    "hero.meta":{en:"Established 2025 &mdash; Worldwide",hu:"Alapítva 2025 &mdash; Világszerte"},
     "m.strategy":{en:"Strategy",hu:"Stratégia"},
     "m.systems":{en:"Design",hu:"Tervezés"},
     "m.frontend":{en:"Hand-built code",hu:"Kézzel írt kód"},
     "m.motion":{en:"Domain &amp; email setup",hu:"Domain és e-mail beállítás"},
     "m.perf":{en:"Launch &amp; hosting",hu:"Indítás és tárhely"},
-    "m.seo":{en:"SEO foundations",hu:"SEO alapok"},
+    "m.seo":{en:"Search engine optimization",hu:"Keresőoptimalizálás"},
     "m.builds":{en:"Ongoing care",hu:"Folyamatos gondozás"},
     "m.maint":{en:"Always in the loop",hu:"Mindig képben"},
     "approach.eyebrow":{en:"What we do",hu:"Amit csinálunk"},
     "approach.h2":{en:"Everything it takes,<br>under <em>one roof</em>.",hu:"Minden, ami kell,<br><em>egy helyen</em>."},
-    "approach.p":{en:"We won&rsquo;t hand you a pile of logins and wish you luck. From the first chat to the live site, it&rsquo;s all on us &mdash; and you&rsquo;re kept in the loop the whole way.",hu:"Nem nyomunk a kezedbe egy halom belépési adatot, hogy aztán sok sikert. Az első beszélgetéstől az élő oldalig mindent mi csinálunk &mdash; és végig képben tartunk."},
+    "approach.p":{en:"We won&rsquo;t hand you a list of logins and leave you to manage it. From the first conversation through to the live site, we handle it all &mdash; and you&rsquo;re kept informed at every stage.",hu:"Nem nyomunk a kezedbe egy halom belépési adatot, hogy aztán magadra hagyjunk. Az első beszélgetéstől az élő oldalig mindent mi kezelünk &mdash; és minden szakaszban tájékoztatunk."},
     "adv.eyebrow":{en:"No brief? No problem",hu:"Nincs kész terv? Semmi gond"},
     "adv.h2":{en:"No clear idea yet?<br>That&rsquo;s <em>the point of us</em>.",hu:"Még nincs kész elképzelésed?<br><em>Pont ezért</em> vagyunk."},
-    "adv.p":{en:"A lot of people come to us with nothing more than a hunch and a business they care about. That&rsquo;s honestly where we&rsquo;re at our best &mdash; asking the right questions, walking you through the options, and turning &lsquo;I&rsquo;m not sure&rsquo; into something that just feels right.",hu:"Sokan úgy jönnek hozzánk, hogy csak egy megérzésük van és egy vállalkozás, ami fontos nekik. Pont itt vagyunk a legjobbak &mdash; feltesszük a jó kérdéseket, végigvesszük veled a lehetőségeket, és a &bdquo;nem vagyok benne biztos&rdquo;-ból olyat csinálunk, ami egyszerűen csak jól érződik."},
+    "adv.p":{en:"Many clients come to us with little more than an idea and a business they care about. That is where we do our best work &mdash; asking the right questions, presenting clear options, and turning uncertainty into a confident direction.",hu:"Sok ügyfelünk csupán egy ötlettel és egy számára fontos vállalkozással érkezik hozzánk. Pontosan ilyenkor nyújtjuk a legjobb munkánkat &mdash; feltesszük a megfelelő kérdéseket, áttekinthető lehetőségeket mutatunk, és a bizonytalanságból határozott irányt formálunk."},
     "svc1.title":{en:"Design",hu:"Dizájn"},
-    "svc1.p":{en:"How your site looks, feels and fits together &mdash; shaped around your business, not a stock layout. Brand direction, structure, the whole visual system, built for you alone.",hu:"Az oldalad megjelenése, hangulata és felépítése &mdash; a vállalkozásodra szabva, nem egy kész elrendezésből. Márkairány, szerkezet, a teljes vizuális rendszer, csak a tiéd."},
+    "svc1.p":{en:"The way your site looks, feels and fits together &mdash; shaped around your business rather than a standard template. Brand direction, structure, and the complete visual system, designed specifically for you.",hu:"Az oldalad megjelenése, hangulata és felépítése &mdash; a vállalkozásodra szabva, nem egy szabványos sablon alapján. Márkairány, szerkezet és a teljes vizuális rendszer, kizárólag a te számodra megtervezve."},
     "svc1.l1":{en:"Brand &amp; visual direction",hu:"Márka és vizuális irány"},
     "svc1.l2":{en:"Layout &amp; design systems",hu:"Elrendezés és dizájnrendszerek"},
     "svc1.l3":{en:"No templates, ever",hu:"Soha semmi sablon"},
     "svc2.title":{en:"Build",hu:"Fejlesztés"},
-    "svc2.p":{en:"Hand-written code that loads fast and holds up over time &mdash; plus everything other studios usually punt back to you. Domain, hosting, business email, the whole setup: done. You won&rsquo;t need to touch a dashboard or a DNS record.",hu:"Kézzel írt kód, amely gyorsan tölt és jól öregszik &mdash; és mindaz, amit más stúdiók rendszerint visszadobnak neked. Domain, tárhely, céges e-mail, a teljes technikai beállítás: elintézve. Egyetlen vezérlőpultot vagy DNS-rekordot sem kell megérintened."},
+    "svc2.p":{en:"Hand-written code that loads quickly and remains reliable over time &mdash; along with everything other studios typically leave for you to manage. Domain, hosting and business email are all included, so you won&rsquo;t need to configure any technical settings yourself.",hu:"Kézzel írt kód, amely gyorsan tölt és hosszú távon is megbízható marad &mdash; mindazzal együtt, amit más stúdiók általában rád hagynak. A domain, a tárhely és a céges e-mail is benne van, így semmilyen technikai beállítást nem kell magadnak elvégezned."},
     "svc2.l1":{en:"Custom frontends",hu:"Egyedi frontendek"},
     "svc2.l2":{en:"Domain, email &amp; hosting",hu:"Domain, e-mail és tárhely"},
-    "svc2.l3":{en:"Performance &amp; SEO",hu:"Teljesítmény és SEO"},
+    "svc2.l3":{en:"Performance &amp; search engine optimization",hu:"Teljesítmény és keresőoptimalizálás"},
     "svc3.title":{en:"Maintain",hu:"Karbantartás"},
-    "svc3.p":{en:"Launch isn&rsquo;t where we leave you. We stick around as your technical partner &mdash; keeping things fast, secure and up to date with fixes and improvements as your business grows.",hu:"Az indítás nem a célvonal. Technikai partnerként veled maradunk &mdash; az oldal gyors, biztonságos és naprakész marad: frissítések, javítások és fejlesztések, ahogy a vállalkozásod növekszik."},
+    "svc3.p":{en:"Launch is not where our involvement ends. We remain your technical partner, keeping your site fast, secure and up to date with improvements as your business grows.",hu:"Az indítás nem a kapcsolatunk vége. Technikai partneredként veled maradunk, és gondoskodunk arról, hogy az oldalad gyors, biztonságos és naprakész legyen, ahogy a vállalkozásod növekszik."},
     "svc3.l1":{en:"Ongoing support",hu:"Folyamatos támogatás"},
     "svc3.l2":{en:"Updates &amp; iteration",hu:"Frissítések és fejlesztés"},
     "svc3.l3":{en:"One point of contact",hu:"Egyetlen kapcsolattartó"},
@@ -806,9 +808,9 @@
     "work3.tag":{en:"Design + Motion",hu:"Dizájn + Mozgás"},
     "process.eyebrow":{en:"How we work",hu:"Hogyan dolgozunk"},
     "process.h2":{en:"We build in <em>layers</em>.",hu:"<em>Rétegekben</em> építkezünk."},
-    "process.p":{en:"You&rsquo;ll always know where things stand &mdash; no black box, no going quiet for weeks. Here&rsquo;s how a project actually moves.",hu:"Mindig tudni fogod, hol tart a projekt &mdash; nincs fekete doboz, nincs heteken át tartó csend. Így halad egy munka."},
+    "process.p":{en:"You will always know where the project stands &mdash; no black box, and no long silences. Here is how a project moves forward.",hu:"Mindig tudni fogod, hol tart a projekt &mdash; nincs fekete doboz és nincs hosszú csend. Így halad előre egy projekt."},
     "layer1.title":{en:"Foundation",hu:"Alapozás"},
-    "layer1.p":{en:"We start by getting to know you &mdash; your goals, your customers, what &lsquo;done right&rsquo; actually looks like for you. Nothing gets built until we&rsquo;re on the same page.",hu:"Azzal kezdjük, hogy megértünk téged &mdash; a céljaidat, az ügyfeleidet, és hogy számodra mit jelent a &bdquo;jól megcsinálva&rdquo;. Semmit nem építünk, amíg nem vagyunk egy hullámhosszon."},
+    "layer1.p":{en:"We begin by getting to know you &mdash; your goals, your customers, and what success genuinely looks like for you. Nothing is built until we are fully aligned.",hu:"Azzal kezdjük, hogy megismerünk téged &mdash; a céljaidat, az ügyfeleidet, és hogy számodra mit jelent a siker. Semmit nem építünk, amíg teljesen nem vagyunk egy véleményen."},
     "layer1.meta":{en:"Discovery",hu:"Felfedezés"},
     "layer2.title":{en:"Structure",hu:"Szerkezet"},
     "layer2.p":{en:"We map the whole thing out &mdash; pages, flow, structure &mdash; and agree on it together before a pixel is designed.",hu:"Felvázoljuk az egészet &mdash; oldalak, útvonal, szerkezet &mdash;, és közösen jóváhagyjuk, mielőtt egyetlen pixel is megszületne."},
@@ -817,20 +819,20 @@
     "layer3.p":{en:"Your site comes to life in hand-built code, shared with you as it grows. You see it take shape, not just the final reveal.",hu:"Az oldalad kézzel írt kódban kel életre, és menet közben végig megmutatjuk. Látod, ahogy formálódik &mdash; nem csak a kész végeredményt."},
     "layer3.meta":{en:"Design + Build",hu:"Dizájn + Fejlesztés"},
     "layer4.title":{en:"Launch",hu:"Indítás"},
-    "layer4.p":{en:"We handle the entire go-live &mdash; domain, email, hosting, all of it. You just get to watch it appear. And we don&rsquo;t disappear after.",hu:"A teljes élesítést mi intézzük &mdash; domain, e-mail, tárhely, minden. Te csak nézed, ahogy megjelenik. Aztán is melletted maradunk."},
+    "layer4.p":{en:"We manage the entire launch &mdash; domain, email, hosting and everything in between. You simply watch it go live, and we remain involved afterward.",hu:"A teljes indítást mi kezeljük &mdash; domain, e-mail, tárhely és minden, ami közéjük esik. Te csak nézed, ahogy élesedik, és ezután is jelen vagyunk."},
     "layer4.meta":{en:"Ship + Care",hu:"Indítás + Gondozás"},
     "studio.eyebrow":{en:"The studio",hu:"A stúdió"},
     "studio.h2":{en:"Small by <em>design</em>.",hu:"Szándékosan <em>kicsi</em>."},
-    "studio.p":{en:"Webstrakt is two people who&rsquo;d rather nail a handful of things than be just okay at everything. You talk to the people actually doing the work &mdash; every time.",hu:"A Webstrakt két ember, akik inkább néhány dolgot csinálnak kivételesen, mint mindent éppen csak elfogadhatóan. Mindig azokkal beszélsz, akik a munkát végzik."},
+    "studio.p":{en:"Webstrakt is two people who would rather do a few things exceptionally well than many things adequately. You always work directly with the people doing the work.",hu:"A Webstrakt két ember, akik inkább néhány dolgot csinálnak kivételesen jól, mint sok mindent csak elfogadhatóan. Mindig azokkal dolgozol együtt, akik a munkát végzik."},
     "stat1.lab":{en:"Custom-built, zero templates",hu:"Egyedi fejlesztés, nulla sablon"},
     "stat2.lab":{en:"Founders, hands on every project",hu:"Alapító, jelen minden projektben"},
     "stat3.lab":{en:"Target load time, every page",hu:"Cél betöltési idő, minden oldalon"},
     "stat4.lab":{en:"Attention to the small things",hu:"Figyelem az apró részletekre"},
     "cta.h2":{en:"Let&rsquo;s build something <em>that&rsquo;s yours</em>.",hu:"Építsünk valamit, <em>ami a tiéd</em>."},
-    "cta.p":{en:"Tell us what you&rsquo;re picturing &mdash; or even just where you&rsquo;re stuck. We&rsquo;ll take it from there.",hu:"Meséld el, mit képzelsz el &mdash; vagy csak azt, hol akadtál el. A többit elintézzük."},
+    "cta.p":{en:"Tell us what you have in mind &mdash; or simply where you feel stuck. We will take it from there.",hu:"Meséld el, mire gondolsz &mdash; vagy egyszerűen csak azt, hol akadtál el. Onnantól mi vesszük át."},
     "cta.btn":{en:"Start a project",hu:"Projekt indítása"},
     "cta.emailpre":{en:"or email ",hu:"vagy írj e-mailt: "},
-    "foot.tagline":{en:"A two-person studio that designs, builds, and handles everything after &mdash; so your website just works.",hu:"Kétfős stúdió, amely tervez, fejleszt és utána is mindent elintéz &mdash; hogy a weboldalad egyszerűen csak működjön."},
+    "foot.tagline":{en:"A two-person studio that designs, builds, and manages everything afterward &mdash; so your website simply works.",hu:"Kétfős stúdió, amely tervez, fejleszt, és utána is mindent kezel &mdash; hogy a weboldalad egyszerűen működjön."},
     "foot.menu":{en:"Menu",hu:"Menü"},
     "foot.connect":{en:"Connect",hu:"Kapcsolat"},
     "foot.email":{en:"Email",hu:"E-mail"},
@@ -856,7 +858,7 @@
     "perf.line":{en:"This page · hand-coded · zero frameworks · {kb} kB · loaded in {ms} ms",hu:"Ez az oldal · kézzel kódolva · nulla keretrendszer · {kb} kB · {ms} ms alatt betöltve"},
     "form.eyebrow":{en:"Start a project",hu:"Projekt indítása"},
     "form.h1":{en:"Tell us about your <em>project</em>.",hu:"Mesélj a <em>projektedről</em>."},
-    "form.lead":{en:"Share a few details and we&rsquo;ll get back to you within two business days. The more you tell us, the sharper our first reply will be.",hu:"Adj meg néhány részletet, és két munkanapon belül jelentkezünk. Minél többet osztasz meg, annál pontosabb lesz az első válaszunk."},
+    "form.lead":{en:"Share a few details, and we will respond within two business days. The more context you provide, the more focused our first reply will be.",hu:"Adj meg néhány részletet, és két munkanapon belül válaszolunk. Minél több részletet adsz meg, annál célzottabb lesz az első válaszunk."},
     "form.prefer":{en:"Prefer email?",hu:"Inkább e-mailben?"},
     "l.name":{en:"Name <span class='req'>*</span>",hu:"Név <span class='req'>*</span>"},
     "l.email":{en:"Email <span class='req'>*</span>",hu:"E-mail <span class='req'>*</span>"},
@@ -1029,7 +1031,7 @@
   function tickClock(){
     if(!studioClock) return;
     try{
-      studioClock.textContent = "BUD " + new Intl.DateTimeFormat("en-GB", {hour:"2-digit", minute:"2-digit", timeZone:"Europe/Budapest"}).format(new Date());
+      studioClock.textContent = "Budapest " + new Intl.DateTimeFormat("en-GB", {hour:"2-digit", minute:"2-digit", timeZone:"Europe/Budapest"}).format(new Date());
     }catch(e){ studioClock.textContent = ""; }
   }
   tickClock(); setInterval(tickClock, 30000);
@@ -1089,6 +1091,34 @@
   var replayBtn = document.getElementById("replayBtn");
   if(replayBtn){ replayBtn.addEventListener("click", playProof); }
   if(scrubMQ.addEventListener){ scrubMQ.addEventListener("change", function(){ if(isScrub()){ scrubUpdate(); } else { setStageCount(5); } }); }
+
+  /* click-to-jump: lets people skip straight to any stage (e.g. step 1 to step 5) instead of scrolling through every one */
+  var scrubThresholds = [.06, .26, .46, .66, .86];
+  function goToStage(n){
+    if(!proofSec) return;
+    if(isScrub()){
+      var r = proofTrack.getBoundingClientRect();
+      var total = r.height - window.innerHeight;
+      if(total <= 0){ setStageCount(n); return; }
+      var absoluteTop = window.scrollY + r.top;
+      var targetP = (n >= 5) ? 1 : Math.min(1, scrubThresholds[n - 1] + .01);
+      var targetScroll = absoluteTop + targetP * total;
+      var rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: Math.max(0, targetScroll), behavior: rm ? "auto" : "smooth" });
+      setStageCount(n);
+    } else {
+      proofTimers.forEach(clearTimeout); proofTimers = [];
+      setStageCount(n);
+    }
+  }
+  proofSteps.forEach(function(li){
+    var n = parseInt(li.getAttribute("data-stage"), 10);
+    if(!n) return;
+    li.addEventListener("click", function(){ goToStage(n); });
+    li.addEventListener("keydown", function(e){
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); goToStage(n); }
+    });
+  });
 
   /* ---------- perf receipt — real measured numbers for this very page ---------- */
   var perfVals = null;
