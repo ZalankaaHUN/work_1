@@ -1,1 +1,1206 @@
+<!--
+  WEBSTRAKT — single-file site (home + "Start a project" form view)
 
+  Why one file: the form is a full-screen VIEW toggled in-page, so every
+  button works in any environment with no broken links between pages.
+
+  EMAIL DELIVERY (form): submissions go to STUDIO_EMAIL (hello@webstrakt.com)
+  via FormSubmit. First live submission triggers a one-time confirmation email.
+
+  EN/HU toggle: English default. All copy lives in the DICT object near the end.
+
+  CRAFT DETAILS (all in the "craft details" CSS block + matching JS):
+  - Surveyor spine: fixed section ruler on the right edge (desktop) that tracks
+    where you are on the page; shifts to light ticks over the dark Process band.
+  - Ink underline: a hand-drawn moss stroke draws itself under the hero italic.
+  - Registration marks: printer's corner marks fade in around section headings.
+  - Drafting brackets: corner marks snap onto a service card on hover.
+  - Studio status: live "taking on projects" pulse + Budapest local time, footer.
+  - Magnetic buttons: subtle pull toward the cursor (fine pointers only).
+
+  CAPABILITY SHOWCASES:
+  - Proof section (#proof): a mini site assembles itself inside a browser
+    frame — wireframe → type → colour → content → launch — with the step list
+    lit in sync. On desktop it's SCROLL-SCRUBBED: a tall track with a sticky
+    stage, so scrolling down builds it and scrolling up rewinds it. Native
+    scrolling is never intercepted (no hijacking). Small/short viewports and
+    reduced-motion users get the autoplay + replay-button fallback instead.
+  - Perf receipt (#studio): real measured numbers for THIS page (size + load
+    time from the Performance API), printed like a till receipt under the stats.
+  - Strata wipe: layered earth-tone bands sweep the screen when switching
+    between the home and form views.
+  All of it respects prefers-reduced-motion and is decorative-only (aria-safe).
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Webstrakt — Websites built to last</title>
+<meta name="description" content="Webstrakt is a two-person web studio that designs, builds and launches your site — domain and business email included — keeping you involved at every step, without the heavy lifting." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Hanken+Grotesk:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper:#F4F2EB; --paper-2:#ECE9E0; --paper-3:#E3DFD3;
+    --ink:#201E1A; --ink-soft:#4A463F;
+    --stone:#948F81; --stone-soft:#BDB8AB; --line:#D7D2C5;
+    --moss:#5E7050; --moss-deep:#475440; --moss-soft:rgba(94,112,80,.10);
+    --serif:"Fraunces",Georgia,serif; --sans:"Hanken Grotesk",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+    --r:14px; --container:1180px; --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+  body{ background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.6; overflow-x:hidden; }
+  section[id]{ scroll-margin-top:84px; }
+  body::after{ content:""; position:fixed; inset:0; z-index:9000; pointer-events:none; opacity:.045; mix-blend-mode:multiply; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  a{ color:inherit; text-decoration:none; }
+  ::selection{ background:var(--moss); color:var(--paper); }
+  .wrap{ width:100%; max-width:var(--container); margin-inline:auto; padding-inline:28px; }
+  @media (max-width:600px){ .wrap{ padding-inline:20px; } }
+  .mono{ font-family:var(--mono); font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; font-weight:500; }
+  .eyebrow{ color:var(--moss); display:inline-flex; align-items:center; gap:.7em; }
+  .eyebrow::before{ content:""; width:26px; height:1px; background:var(--moss); display:inline-block; }
+
+  /* nav */
+  header{ position:fixed; inset:0 0 auto 0; z-index:1000; transition:background .4s var(--ease),border-color .4s var(--ease),backdrop-filter .4s; border-bottom:1px solid transparent; }
+  header.scrolled, body.show-start header{ background:rgba(244,242,235,.78); backdrop-filter:blur(14px) saturate(140%); border-bottom:1px solid var(--line); }
+  nav{ display:flex; align-items:center; justify-content:space-between; height:74px; gap:18px; }
+  .brand{ display:flex; align-items:center; gap:11px; font-family:var(--serif); font-weight:500; font-size:1.32rem; letter-spacing:-.01em; flex:none; cursor:pointer; }
+  .mark{ width:26px; height:26px; flex:none; }
+  .nav-links{ display:flex; align-items:center; gap:34px; margin-left:auto; }
+  .nav-links a{ font-size:.95rem; color:var(--ink-soft); position:relative; transition:color .25s; }
+  .nav-links a::after{ content:""; position:absolute; left:0; bottom:-5px; height:1px; width:0; background:var(--moss); transition:width .3s var(--ease); }
+  .nav-links a:hover{ color:var(--ink); }
+  .nav-links a:hover::after{ width:100%; }
+  body.show-start .nav-links{ display:none; }
+
+  .lang{ display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:100px; overflow:hidden; flex:none; }
+  body.show-start .lang{ margin-left:auto; }
+  .lang-btn{ font-family:var(--mono); font-size:.64rem; letter-spacing:.12em; padding:.5em .72em; background:transparent; border:none; color:var(--stone); cursor:pointer; transition:background .25s var(--ease),color .25s; }
+  .lang-btn.active{ background:var(--ink); color:var(--paper); }
+  .lang-btn:not(.active):hover{ color:var(--ink); }
+
+  .btn{ display:inline-flex; align-items:center; gap:.6em; font-family:var(--sans); font-weight:500; font-size:.93rem; padding:.74em 1.4em; border-radius:100px; border:1px solid var(--ink); background:var(--ink); color:var(--paper); cursor:pointer; transition:transform .3s var(--ease),box-shadow .3s; }
+  .btn svg{ transition:transform .3s var(--ease); }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 10px 26px -10px rgba(32,30,26,.5); }
+  .btn:hover svg{ transform:translate(3px,-3px); }
+  .btn.ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn.ghost:hover{ border-color:var(--ink); box-shadow:none; }
+  .nav .btn{ flex:none; }
+  body.show-start .nav-start{ display:none; }
+  .nav-back{ display:none; align-items:center; gap:7px; font-size:.92rem; color:var(--ink-soft); cursor:pointer; transition:color .25s; }
+  .nav-back:hover{ color:var(--moss); }
+  body.show-start .nav-back{ display:inline-flex; }
+
+  .menu-toggle{ display:none; background:none; border:none; cursor:pointer; padding:8px; flex:none; }
+  .menu-toggle span{ display:block; width:24px; height:1.5px; background:var(--ink); transition:.3s var(--ease); }
+  .menu-toggle span+span{ margin-top:6px; }
+  body.show-start .menu-toggle{ display:none; }
+
+  /* hero */
+  .hero{ position:relative; padding-top:188px; padding-bottom:120px; overflow:hidden; }
+  .topo{ position:absolute; top:-18%; right:-12%; width:780px; height:780px; z-index:0; pointer-events:none; background:repeating-radial-gradient(circle at 50% 50%, transparent 0 36px, rgba(148,143,129,.16) 36px 37px); -webkit-mask:radial-gradient(circle at 50% 50%, #000 0%, transparent 62%); mask:radial-gradient(circle at 50% 50%, #000 0%, transparent 62%); animation:drift 32s linear infinite; will-change:transform; }
+  .topo.b{ width:430px; height:430px; top:34%; right:34%; background:repeating-radial-gradient(circle at 50% 50%, transparent 0 22px, rgba(94,112,80,.18) 22px 23px); animation-duration:26s; animation-direction:reverse; }
+  @keyframes drift{ to{ transform:rotate(360deg); } }
+  .hero-glow{ position:absolute; top:-10%; right:-5%; width:620px; height:620px; z-index:0; pointer-events:none; background:radial-gradient(circle, var(--moss-soft), transparent 65%); filter:blur(20px); }
+  .hero-inner{ position:relative; z-index:1; max-width:920px; }
+  .hero h1{ font-family:var(--serif); font-weight:400; font-size:clamp(2.9rem,7.4vw,6rem); line-height:1.0; letter-spacing:-.025em; margin:26px 0 0; }
+  .hero h1 em{ font-style:italic; color:var(--moss); }
+  .hero p.lead{ font-size:clamp(1.05rem,1.7vw,1.32rem); color:var(--ink-soft); max-width:560px; margin:30px 0 0; line-height:1.55; font-weight:300; }
+  .hero-cta{ display:flex; flex-wrap:wrap; gap:14px; margin-top:42px; align-items:center; }
+  .hero-meta{ margin-left:6px; color:var(--stone); }
+
+  .reveal-load{ opacity:0; transform:translateY(22px); }
+  .loaded .reveal-load{ opacity:1; transform:none; transition:opacity .9s var(--ease),transform .9s var(--ease); }
+  .loaded .d1{ transition-delay:.05s; } .loaded .d2{ transition-delay:.16s; } .loaded .d3{ transition-delay:.27s; } .loaded .d4{ transition-delay:.38s; } .loaded .d5{ transition-delay:.49s; }
+
+  .marquee{ border-block:1px solid var(--line); padding:20px 0; overflow:hidden; margin-top:30px; }
+  .marquee-track{ display:flex; gap:54px; width:max-content; animation:scroll 34s linear infinite; }
+  .marquee:hover .marquee-track{ animation-play-state:paused; }
+  .marquee span{ color:var(--stone); display:inline-flex; align-items:center; gap:54px; white-space:nowrap; }
+  .marquee span::after{ content:"✦"; color:var(--moss); font-size:.6rem; }
+  @keyframes scroll{ to{ transform:translateX(-50%); } }
+
+  .sec{ padding-block:clamp(5.5rem,12vh,9.5rem); }
+  .sec-head{ max-width:680px; }
+  .sec-head h2{ font-family:var(--serif); font-weight:400; letter-spacing:-.02em; font-size:clamp(2rem,4.4vw,3.4rem); line-height:1.05; margin-top:20px; }
+  .sec-head h2 em{ font-style:italic; color:var(--moss); }
+  .sec-head p{ color:var(--ink-soft); margin-top:18px; font-weight:300; max-width:520px; }
+  .reveal{ opacity:0; transform:translateY(28px); transition:opacity .8s var(--ease),transform .8s var(--ease); }
+  .reveal.in{ opacity:1; transform:none; }
+
+  .services{ display:grid; grid-template-columns:repeat(3,1fr); margin-top:64px; border-top:1px solid var(--line); }
+  .svc{ padding:38px 32px 44px; border-bottom:1px solid var(--line); border-right:1px solid var(--line); position:relative; transition:background .4s var(--ease); }
+  .svc:nth-child(3n){ border-right:none; }
+  .svc:hover{ background:var(--paper-2); }
+  .svc .num{ color:var(--stone); }
+  .svc h3{ font-family:var(--serif); font-weight:500; font-size:1.7rem; margin:26px 0 12px; letter-spacing:-.01em; }
+  .svc p{ color:var(--ink-soft); font-weight:300; font-size:.99rem; }
+  .svc ul{ list-style:none; margin-top:22px; display:flex; flex-direction:column; gap:9px; }
+  .svc li{ font-size:.86rem; color:var(--stone); display:flex; align-items:center; gap:10px; }
+  .svc li::before{ content:""; width:5px; height:5px; border-radius:50%; background:var(--moss); flex:none; }
+  .svc .arrow{ position:absolute; top:38px; right:30px; opacity:0; transform:translate(-6px,6px); transition:.4s var(--ease); color:var(--moss); }
+  .svc:hover .arrow{ opacity:1; transform:none; }
+
+  .work-grid{ display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:64px; }
+  .work-grid > a:first-child{ grid-column:1 / -1; }
+  .card{ border:1px solid var(--line); border-radius:var(--r); overflow:hidden; background:var(--paper-2); transition:transform .5s var(--ease),box-shadow .5s var(--ease),border-color .4s; display:block; cursor:pointer; }
+  .card:hover{ transform:translateY(-5px); box-shadow:0 26px 50px -28px rgba(32,30,26,.4); border-color:var(--stone-soft); }
+  .thumb{ aspect-ratio:16/9; position:relative; overflow:hidden; background:var(--paper-3); }
+  .work-grid > a:first-child .thumb{ aspect-ratio:21/8; }
+  .thumb-art{ position:absolute; inset:0; transition:transform 1.1s var(--ease); }
+  .card:hover .thumb-art{ transform:scale(1.04); }
+  .art-1{ background:linear-gradient(115deg, var(--moss-deep), var(--moss) 60%, var(--stone) 100%); }
+  .art-1::after{ content:""; position:absolute; inset:0; background:repeating-linear-gradient(90deg, transparent 0 38px, rgba(244,242,235,.12) 38px 39px); }
+  .art-2{ background:linear-gradient(160deg, var(--ink), var(--ink-soft)); }
+  .art-2::after{ content:""; position:absolute; inset:14% 12% auto 12%; height:46%; border-radius:8px; border:1px solid rgba(244,242,235,.22); background:repeating-linear-gradient(0deg, transparent 0 13px, rgba(244,242,235,.08) 13px 14px); }
+  .art-3{ background:radial-gradient(circle at 30% 30%, var(--stone), var(--paper-3) 70%); }
+  .art-3::after{ content:""; position:absolute; inset:0; background:repeating-radial-gradient(circle at 30% 30%, transparent 0 26px, rgba(32,30,26,.10) 26px 27px); }
+  .card .body{ padding:24px 26px 28px; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; }
+  .card h3{ font-family:var(--serif); font-weight:500; font-size:1.45rem; letter-spacing:-.01em; }
+  .card .body p{ color:var(--ink-soft); font-size:.93rem; font-weight:300; margin-top:5px; }
+  .tag{ font-family:var(--mono); font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:var(--stone); border:1px solid var(--line); padding:.4em .8em; border-radius:100px; white-space:nowrap; flex:none; }
+
+  .process{ background:var(--ink); color:var(--paper); }
+  .process .eyebrow{ color:#A9BFA0; } .process .eyebrow::before{ background:#A9BFA0; }
+  .process .sec-head h2{ color:var(--paper); } .process .sec-head h2 em{ color:#A9BFA0; }
+  .process .sec-head p{ color:#B4AFA3; }
+  .strata{ margin-top:60px; border-top:1px solid rgba(244,242,235,.14); }
+  .layer{ display:grid; grid-template-columns:96px 1fr auto; gap:30px; align-items:baseline; padding:34px 0; border-bottom:1px solid rgba(244,242,235,.14); transition:padding-left .5s var(--ease); }
+  .layer:hover{ padding-left:14px; }
+  .layer .lnum{ font-family:var(--mono); font-size:.9rem; color:#7E8A75; }
+  .layer h3{ font-family:var(--serif); font-weight:400; font-size:clamp(1.5rem,3vw,2.3rem); letter-spacing:-.01em; }
+  .layer p{ color:#B4AFA3; font-weight:300; max-width:520px; margin-top:8px; font-size:.98rem; }
+  .layer .lmeta{ font-family:var(--mono); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:#7E8A75; }
+
+  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+  .stat{ padding:36px 0; border-top:1px solid var(--line); }
+  .stat .big{ font-family:var(--serif); font-weight:300; font-size:clamp(2.6rem,6vw,4.2rem); line-height:1; letter-spacing:-.03em; color:var(--moss); }
+  .stat .lab{ color:var(--ink-soft); font-size:.9rem; font-weight:300; margin-top:14px; }
+
+  .cta{ text-align:center; position:relative; overflow:hidden; }
+  .cta .topo{ top:auto; bottom:-40%; left:50%; right:auto; transform:translateX(-50%); opacity:.7; }
+  .cta-inner{ position:relative; z-index:1; max-width:760px; margin-inline:auto; }
+  .cta h2{ font-family:var(--serif); font-weight:400; letter-spacing:-.025em; font-size:clamp(2.4rem,6vw,4.4rem); line-height:1.02; }
+  .cta h2 em{ font-style:italic; color:var(--moss); }
+  .cta p{ color:var(--ink-soft); font-weight:300; margin:24px auto 38px; max-width:480px; }
+  .cta .email{ display:block; margin-top:30px; font-family:var(--mono); font-size:.8rem; letter-spacing:.14em; color:var(--stone); }
+  .cta .email a{ color:var(--ink); border-bottom:1px solid var(--moss); padding-bottom:2px; }
+
+  .advisor{ background:var(--paper-2); text-align:center; border-block:1px solid var(--line); }
+  .advisor-inner{ max-width:720px; margin-inline:auto; }
+  .advisor .eyebrow{ justify-content:center; }
+  .advisor h2{ font-family:var(--serif); font-weight:400; letter-spacing:-.02em; font-size:clamp(2rem,5vw,3.4rem); line-height:1.05; margin-top:18px; }
+  .advisor h2 em{ font-style:italic; color:var(--moss); }
+  .advisor p{ color:var(--ink-soft); font-weight:300; margin-top:20px; max-width:560px; margin-inline:auto; }
+
+  footer{ border-top:1px solid var(--line); padding-block:70px 40px; }
+  .foot-top{ display:grid; grid-template-columns:1.7fr 1fr 1fr; gap:40px; }
+  .foot-brand p{ color:var(--ink-soft); font-weight:300; max-width:300px; margin-top:18px; font-size:.95rem; }
+  .foot-col h4{ font-family:var(--mono); font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:var(--stone); margin-bottom:18px; font-weight:500; }
+  .foot-col a{ display:block; color:var(--ink-soft); font-size:.95rem; margin-bottom:11px; transition:color .25s; cursor:pointer; }
+  .foot-col a:hover{ color:var(--moss); }
+  .foot-bottom{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-top:64px; padding-top:28px; border-top:1px solid var(--line); }
+  .foot-bottom .mono{ color:var(--stone); }
+  .totop{ display:inline-flex; align-items:center; gap:8px; color:var(--ink-soft); font-size:.85rem; transition:color .25s; cursor:pointer; }
+  .totop:hover{ color:var(--moss); }
+
+  /* ===== start (form) view ===== */
+  .startview{ display:none; }
+  body.show-start #home{ display:none; }
+  body.show-start .startview{ display:block; }
+  .start-main{ position:relative; overflow:hidden; }
+  .startview .grid{ position:relative; z-index:1; display:grid; grid-template-columns:0.85fr 1.15fr; gap:64px; padding-block:140px 110px; }
+  .intro h1{ font-family:var(--serif); font-weight:400; font-size:clamp(2.4rem,4.6vw,3.6rem); line-height:1.04; letter-spacing:-.025em; margin:22px 0 0; }
+  .intro h1 em{ font-style:italic; color:var(--moss); }
+  .intro > p{ color:var(--ink-soft); font-weight:300; margin-top:22px; max-width:360px; }
+  .intro .detail{ margin-top:40px; padding-top:26px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:14px; }
+  .intro .detail a{ color:var(--ink); border-bottom:1px solid var(--moss); padding-bottom:1px; width:max-content; }
+  .intro .detail .mono{ color:var(--stone); }
+  .field{ margin-bottom:24px; }
+  .field label{ display:block; font-family:var(--mono); font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:var(--stone); margin-bottom:9px; }
+  .field input, .field select, .field textarea{ width:100%; font-family:var(--sans); font-size:1rem; color:var(--ink); background:var(--paper-2); border:1px solid var(--line); border-radius:10px; padding:14px 16px; transition:border-color .25s var(--ease),background .25s,box-shadow .25s; }
+  .field textarea{ min-height:140px; resize:vertical; }
+  .field input:focus, .field select:focus, .field textarea:focus{ outline:none; border-color:var(--moss); background:var(--paper); box-shadow:0 0 0 3px var(--moss-soft); }
+  .field select{ appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23948F81' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; padding-right:40px; }
+  .frow{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .form-foot{ display:flex; align-items:center; gap:18px; margin-top:8px; flex-wrap:wrap; }
+  .form-status{ font-size:.92rem; color:var(--moss-deep); background:var(--moss-soft); border:1px solid rgba(94,112,80,.3); padding:10px 16px; border-radius:10px; }
+  .form-status.warn{ color:#7a4327; background:rgba(150,80,40,.08); border-color:rgba(150,80,40,.32); }
+  .form-done{ display:flex; flex-direction:column; align-items:flex-start; justify-content:center; min-height:340px; animation:doneIn .6s var(--ease) both; }
+  .form-done[hidden]{ display:none; }
+  @keyframes doneIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+  .done-check{ width:56px; height:56px; border-radius:50%; background:var(--moss-soft); border:1px solid rgba(94,112,80,.35); display:flex; align-items:center; justify-content:center; color:var(--moss-deep); margin-bottom:24px; }
+  .form-done h2{ font-family:var(--serif); font-weight:400; font-size:clamp(1.9rem,3.4vw,2.7rem); line-height:1.06; letter-spacing:-.02em; }
+  .form-done p{ color:var(--ink-soft); font-weight:300; margin-top:14px; max-width:430px; }
+  .done-actions{ display:flex; gap:12px; margin-top:32px; flex-wrap:wrap; }
+  .req{ color:var(--moss); }
+
+  @media (max-width:980px){
+    .services{ grid-template-columns:1fr; } .svc{ border-right:none; }
+    .work-grid{ grid-template-columns:1fr; }
+    .stats{ grid-template-columns:1fr 1fr; }
+    .foot-top{ grid-template-columns:1fr 1fr; } .foot-brand{ grid-column:1 / -1; }
+  }
+  @media (max-width:860px){ .startview .grid{ grid-template-columns:1fr; gap:40px; padding-block:120px 80px; } .intro > p{ max-width:none; } }
+  @media (max-width:760px){
+    .nav-links, header .nav-start{ display:none; }
+    .menu-toggle{ display:block; }
+    nav{ gap:12px; }
+    .lang{ margin-left:auto; }
+    .lang-btn{ padding:.44em .62em; font-size:.62rem; }
+    .layer{ grid-template-columns:1fr; gap:8px; } .layer .lmeta{ display:none; }
+  }
+  @media (max-width:520px){ .stats{ grid-template-columns:1fr; } .foot-top{ grid-template-columns:1fr; } .frow{ grid-template-columns:1fr; } }
+
+  .overlay{ position:fixed; inset:0; z-index:1500; background:var(--paper); display:flex; flex-direction:column; justify-content:center; gap:6px; padding:40px; transform:translateY(-100%); transition:transform .55s var(--ease); }
+  .overlay.open{ transform:none; }
+  .overlay a{ font-family:var(--serif); font-size:2.2rem; padding:9px 0; border-bottom:1px solid var(--line); cursor:pointer; }
+  .overlay .ov-lang{ margin-top:28px; }
+  .overlay .close{ position:absolute; top:26px; right:26px; font-size:1.6rem; background:none; border:none; cursor:pointer; }
+
+  /* ===== craft details ===== */
+
+  /* keyboard focus — visible, on-brand */
+  :focus-visible{ outline:2px solid var(--moss); outline-offset:3px; border-radius:4px; }
+
+  /* hand-drawn ink underline — draws itself under the hero italic after load */
+  .hero h1 em{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8 Q 30 3.5 60 7 T 118 5' fill='none' stroke='%235E7050' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:0 96%; background-size:0% .13em;
+    animation:inkdraw .9s var(--ease) 1.15s forwards;
+    padding-bottom:.06em;
+  }
+  @keyframes inkdraw{ to{ background-size:100% .13em; } }
+
+  /* surveyor spine — fixed section ruler, ties into the topo/strata motif */
+  .spine{ position:fixed; right:26px; top:50%; transform:translateY(-50%); z-index:900; display:flex; flex-direction:column; gap:16px; align-items:flex-end; }
+  .spine a{ display:flex; align-items:center; gap:11px; justify-content:flex-end; cursor:pointer; padding:2px 0; }
+  .spine .lbl{ font-family:var(--mono); font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--stone); opacity:0; transform:translateX(7px); transition:opacity .3s var(--ease),transform .3s var(--ease); white-space:nowrap; }
+  .spine .tick{ width:18px; height:1px; background:var(--stone-soft); transition:width .35s var(--ease),background .3s; flex:none; }
+  .spine a:hover .lbl, .spine a.on .lbl{ opacity:1; transform:none; }
+  .spine a:hover .tick{ background:var(--moss); }
+  .spine a.on .tick{ width:32px; background:var(--moss); }
+  .spine.on-dark .lbl{ color:#7E8A75; }
+  .spine.on-dark .tick{ background:rgba(244,242,235,.25); }
+  .spine.on-dark a.on .tick, .spine.on-dark a:hover .tick{ background:#A9BFA0; }
+  body.show-start .spine{ display:none; }
+  @media (max-width:1080px){ .spine{ display:none; } }
+
+  /* registration marks — printer's corner marks framing each section head */
+  .sec-head{ position:relative; }
+  .sec-head::before, .sec-head::after{ content:""; position:absolute; width:16px; height:16px; pointer-events:none; opacity:0; transition:opacity 1s var(--ease) .35s; }
+  .sec-head::before{ top:-20px; left:-22px; border-top:1px solid var(--stone-soft); border-left:1px solid var(--stone-soft); }
+  .sec-head::after{ bottom:-20px; right:-22px; border-bottom:1px solid var(--stone-soft); border-right:1px solid var(--stone-soft); }
+  .sec-head.reveal.in::before, .sec-head.reveal.in::after{ opacity:.9; }
+  .process .sec-head::before, .process .sec-head::after{ border-color:rgba(244,242,235,.22); }
+  @media (max-width:760px){ .sec-head::before, .sec-head::after{ display:none; } }
+
+  /* drafting brackets — corner marks that snap in when a service is inspected */
+  .svc::before, .svc::after{ content:""; position:absolute; width:13px; height:13px; pointer-events:none; opacity:0; transition:opacity .4s var(--ease),transform .4s var(--ease); }
+  .svc::before{ top:15px; left:15px; border-top:1px solid var(--moss); border-left:1px solid var(--moss); transform:translate(7px,7px); }
+  .svc::after{ bottom:15px; right:15px; border-bottom:1px solid var(--moss); border-right:1px solid var(--moss); transform:translate(-7px,-7px); }
+  .svc:hover::before, .svc:hover::after{ opacity:.6; transform:none; }
+
+  /* studio status — live availability + Budapest clock in the footer */
+  .studio-status{ display:inline-flex; align-items:center; gap:10px; font-size:.85rem; color:var(--ink-soft); }
+  .studio-status .pulse{ width:8px; height:8px; border-radius:50%; background:var(--moss); position:relative; flex:none; }
+  .studio-status .pulse::after{ content:""; position:absolute; inset:-4px; border-radius:50%; border:1px solid var(--moss); animation:pulse 2.6s var(--ease) infinite; }
+  @keyframes pulse{ 0%{ transform:scale(.45); opacity:.85; } 70%,100%{ transform:scale(1.3); opacity:0; } }
+  .studio-clock{ color:var(--stone); }
+
+
+
+  /* ===== proof — live build demo ===== */
+  .proof-grid{ display:grid; grid-template-columns:.9fr 1.1fr; gap:60px; align-items:center; }
+  .proof-steps{ list-style:none; margin-top:34px; border-top:1px solid var(--line); }
+  .proof-steps li{ display:flex; align-items:center; gap:14px; padding:13px 0; border-bottom:1px solid var(--line); color:var(--stone); font-size:.95rem; transition:color .4s var(--ease),padding-left .4s var(--ease); }
+  .proof-steps .ps-num{ font-family:var(--mono); font-size:.64rem; letter-spacing:.14em; }
+  .proof-steps li i{ width:7px; height:7px; border-radius:50%; border:1px solid var(--stone-soft); flex:none; margin-left:auto; transition:.4s var(--ease); }
+  .proof-steps li.on{ color:var(--ink); padding-left:6px; }
+  .proof-steps li.on i{ background:var(--moss); border-color:var(--moss); }
+  #replayBtn{ margin-top:28px; }
+
+  .browser{ border:1px solid var(--line); border-radius:16px; background:var(--paper-2); overflow:hidden; box-shadow:0 30px 60px -34px rgba(32,30,26,.35); transition:box-shadow .7s var(--ease); }
+  .proof.s5 .browser{ box-shadow:0 42px 84px -36px rgba(71,84,64,.5); }
+  .b-bar{ display:flex; align-items:center; gap:7px; padding:11px 14px; border-bottom:1px solid var(--line); background:var(--paper); }
+  .b-bar > i{ width:9px; height:9px; border-radius:50%; background:var(--paper-3); border:1px solid var(--line); }
+  .b-url{ font-family:var(--mono); font-size:.62rem; letter-spacing:.08em; color:var(--stone); background:var(--paper-2); border:1px solid var(--line); border-radius:100px; padding:.45em 1em; margin-left:10px; display:inline-flex; align-items:center; gap:7px; }
+  .b-lock{ font-size:.5rem; color:var(--stone-soft); transition:color .4s; }
+  .proof.s5 .b-lock{ color:var(--moss); }
+  .b-live{ margin-left:auto; font-family:var(--mono); font-size:.56rem; letter-spacing:.16em; text-transform:uppercase; background:var(--moss); color:var(--paper); border-radius:100px; padding:.4em .9em; opacity:0; transform:scale(.7); transition:.45s var(--ease); }
+  .proof.s5 .b-live{ opacity:1; transform:none; }
+  .b-page{ padding:26px 28px 30px; position:relative; overflow:hidden; min-height:330px; background:var(--paper-2); transition:background .6s var(--ease); }
+  .proof.s3 .b-page{ background:#FCFBF7; }
+  .b-page::after{ content:""; position:absolute; top:0; bottom:0; width:46%; left:-60%; transform:skewX(-18deg); background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); pointer-events:none; }
+  .proof.s5 .b-page::after{ animation:shine .9s var(--ease) .15s forwards; }
+  @keyframes shine{ to{ left:130%; } }
+  .b-nav, .b-h1, .b-line, .b-btn, .b-cards{ opacity:0; transform:translateY(8px); transition:.5s var(--ease); }
+  .proof.s1 .b-nav, .proof.s1 .b-h1, .proof.s1 .b-line, .proof.s1 .b-btn, .proof.s1 .b-cards{ opacity:1; transform:none; }
+  .proof.s1 .b-h1{ transition-delay:.08s; } .proof.s1 .b-line.w80{ transition-delay:.15s; } .proof.s1 .b-line.w60{ transition-delay:.2s; } .proof.s1 .b-btn{ transition-delay:.26s; } .proof.s1 .b-cards{ transition-delay:.33s; }
+  .b-nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+  .b-logo{ width:64px; height:14px; border-radius:4px; border:1px dashed var(--stone-soft); }
+  .proof.s3 .b-logo{ background:var(--moss); border-color:var(--moss); }
+  .b-links{ display:flex; gap:8px; }
+  .b-links i{ width:34px; height:8px; border-radius:4px; border:1px dashed var(--stone-soft); transition:.5s var(--ease); }
+  .proof.s3 .b-links i{ background:var(--paper-3); border-color:transparent; }
+  .b-h1{ font-family:var(--serif); font-weight:400; letter-spacing:-.02em; font-size:clamp(1.5rem,3vw,2.1rem); line-height:1.1; border:1px dashed var(--stone-soft); border-radius:6px; padding:8px 12px; width:max-content; max-width:100%; color:transparent; }
+  .proof.s2 .b-h1{ color:var(--ink); }
+  .proof.s3 .b-h1{ border-color:transparent; }
+  .b-line{ height:10px; border-radius:5px; border:1px dashed var(--stone-soft); margin-top:12px; }
+  .w80{ width:80%; } .w60{ width:60%; }
+  .proof.s4 .b-line{ background:var(--paper-3); border-color:transparent; }
+  .b-btn{ display:inline-flex; margin-top:18px; font-weight:500; font-size:.72rem; color:transparent; border:1px dashed var(--stone-soft); border-radius:100px; padding:.6em 1.3em; }
+  .proof.s3 .b-btn{ background:var(--moss); border-color:var(--moss); color:var(--paper); }
+  .b-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:26px; }
+  .b-card{ height:84px; border:1px dashed var(--stone-soft); border-radius:8px; overflow:hidden; position:relative; transition:.5s var(--ease); }
+  .b-card::before{ content:""; position:absolute; inset:0 0 38% 0; opacity:0; transition:opacity .6s var(--ease); }
+  .b-card:nth-child(1)::before{ background:linear-gradient(115deg, var(--moss-deep), var(--moss)); }
+  .b-card:nth-child(2)::before{ background:linear-gradient(135deg, var(--stone), var(--stone-soft)); }
+  .b-card:nth-child(3)::before{ background:linear-gradient(160deg, var(--ink), var(--ink-soft)); }
+  .b-card::after{ content:""; position:absolute; left:10px; right:30%; bottom:12px; height:7px; border-radius:4px; border:1px dashed var(--stone-soft); transition:.5s var(--ease); }
+  .proof.s4 .b-card{ border-color:var(--line); border-style:solid; background:#fff; }
+  .proof.s4 .b-card::before{ opacity:1; }
+  .proof.s4 .b-card::after{ background:var(--paper-3); border-color:transparent; }
+  @media (max-width:980px){ .proof-grid{ grid-template-columns:1fr; gap:40px; } .b-page{ min-height:280px; } }
+
+  /* scroll-scrub mode: tall track + sticky stage; scroll position is the playhead.
+     Native scrolling is never intercepted — fast scrolls pass straight through,
+     and scrolling up rewinds the build. Falls back to autoplay + replay button
+     on small/short viewports and for reduced-motion users. */
+  .scrub-hint{ display:none; align-items:center; gap:10px; color:var(--stone); margin-top:28px; }
+  .scrub-hint svg{ animation:hintbob 1.8s var(--ease) infinite; }
+  @keyframes hintbob{ 0%,100%{ transform:translateY(-2px); } 50%{ transform:translateY(3px); } }
+  @media (min-width:981px) and (min-height:561px) and (prefers-reduced-motion:no-preference){
+    .proof{ padding-block:0; }
+    .proof-track{ height:320vh; position:relative; }
+    .proof-sticky{ position:sticky; top:0; min-height:100vh; display:flex; align-items:center; padding-block:84px 40px; }
+    #replayBtn{ display:none; }
+    .scrub-hint{ display:inline-flex; transition:opacity .5s var(--ease); }
+    .proof.s5 .scrub-hint{ opacity:0; }
+  }
+
+  /* ===== perf receipt (studio) ===== */
+  .receipt{ margin-top:38px; padding-top:22px; border-top:1px dashed var(--line); }
+  .receipt .mono{ color:var(--stone); letter-spacing:.14em; font-size:.64rem; }
+  .receipt[hidden]{ display:none; }
+
+  /* ===== strata wipe (view transition) ===== */
+  .wipe{ position:fixed; inset:0; z-index:2000; pointer-events:none; display:flex; flex-direction:column; }
+  .wipe i{ flex:1; transform:translateX(-101%); }
+  .wipe i:nth-child(1){ background:var(--paper-3); }
+  .wipe i:nth-child(2){ background:var(--stone-soft); }
+  .wipe i:nth-child(3){ background:var(--moss); }
+  .wipe i:nth-child(4){ background:var(--ink); }
+  .wipe.in i{ transition:transform .38s var(--ease); transform:translateX(0); }
+  .wipe.out i{ transition:transform .38s var(--ease); transform:translateX(101%); }
+  .wipe.in i:nth-child(2), .wipe.out i:nth-child(2){ transition-delay:.05s; }
+  .wipe.in i:nth-child(3), .wipe.out i:nth-child(3){ transition-delay:.1s; }
+  .wipe.in i:nth-child(4), .wipe.out i:nth-child(4){ transition-delay:.15s; }
+
+  @media (prefers-reduced-motion:reduce){ *{ animation:none !important; transition:none !important; } .reveal,.reveal-load{ opacity:1 !important; transform:none !important; } .hero h1 em{ background-size:100% .13em; } .spine .lbl{ opacity:1; transform:none; } }
+
+  /* === WORK SECTION HIDDEN (no work to show yet) ===
+     To bring it back, delete this one block. It hides the section
+     and every "Work" link (nav, mobile menu, footer). === */
+  #work, a[href="#work"]{ display:none !important; }
+</style>
+
+<!-- ============ NAV (shared) ============ -->
+<header id="header">
+  <div class="wrap">
+    <nav>
+      <a class="brand" data-go="home" aria-label="Webstrakt home">
+        <svg class="mark" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="3" y="3" width="5" height="15" rx="1.5" fill="#201E1A"/>
+          <rect x="3" y="18" width="5" height="5" rx="1.5" fill="#5E7050"/>
+          <rect x="8" y="18" width="15" height="5" rx="1.5" fill="#948F81"/>
+        </svg>
+        Webstrakt
+      </a>
+      <div class="nav-links">
+        <a href="#approach" data-i18n="nav.approach">Approach</a>
+        <a href="#proof" data-i18n="nav.proof">Proof</a>
+        <a href="#work" data-i18n="nav.work">Work</a>
+        <a href="#process" data-i18n="nav.process">Process</a>
+        <a href="#studio" data-i18n="nav.studio">Studio</a>
+      </div>
+      <a class="nav-back" data-go="home">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span data-i18n="back">Back to home</span>
+      </a>
+      <div class="lang" role="group" aria-label="Language">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="hu">HU</button>
+      </div>
+      <a class="btn nav-start" data-go="start">
+        <span data-i18n="nav.cta">Start a project</span>
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu"><span></span><span></span></button>
+    </nav>
+  </div>
+</header>
+
+<div class="overlay" id="overlay">
+  <button class="close" id="closeMenu" aria-label="Close menu">✕</button>
+  <a href="#approach" data-i18n="nav.approach">Approach</a>
+  <a href="#proof" data-i18n="nav.proof">Proof</a>
+  <a href="#work" data-i18n="nav.work">Work</a>
+  <a href="#process" data-i18n="nav.process">Process</a>
+  <a href="#studio" data-i18n="nav.studio">Studio</a>
+  <a data-go="start" style="color:var(--moss)"><span data-i18n="nav.cta">Start a project</span> →</a>
+  <div class="lang ov-lang" role="group" aria-label="Language">
+    <button class="lang-btn active" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="hu">HU</button>
+  </div>
+</div>
+
+<!-- surveyor spine — section ruler (desktop), populated by script -->
+<aside class="spine" id="spine" aria-label="Section navigation"></aside>
+
+<!-- strata wipe — layered view transition -->
+<div class="wipe" id="wipe" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+<!-- ============ HOME ============ -->
+<div id="home">
+<section class="hero" id="top">
+  <div class="topo"></div>
+  <div class="topo b"></div>
+  <div class="hero-glow"></div>
+  <div class="wrap hero-inner">
+    <span class="mono eyebrow reveal-load d1" data-bp="eyebrow · JetBrains Mono · letter-spacing .22em" data-i18n="hero.eyebrow">Design, build, launch &mdash; all of it</span>
+    <h1 class="reveal-load d2" data-bp="h1 · Fraunces 400 · clamp(2.9rem, 7.4vw, 6rem)" data-i18n="hero.h1">Built with you.<br>Handled by <em>us</em>.</h1>
+    <p class="lead reveal-load d3" data-bp="lead · Hanken Grotesk 300 · max-width 560px" data-i18n="hero.lead">Website builders hand you the work. Agencies take the brief and disappear. We do the whole thing &mdash; design, build, launch, your domain, even your business email &mdash; and keep you in on every decision without burying you in the work.</p>
+    <div class="hero-cta reveal-load d4">
+      <a class="btn" data-go="start">
+        <span data-i18n="hero.cta1">Start a project</span>
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#approach" class="btn ghost" data-i18n="hero.cta2">See how it works</a>
+      <span class="mono hero-meta" data-i18n="hero.meta">Est. 2025 &mdash; Worldwide</span>
+    </div>
+  </div>
+</section>
+
+<div class="marquee reveal-load d5" aria-hidden="true" data-bp="marquee · 34s linear loop · pauses on hover">
+  <div class="marquee-track">
+    <span data-i18n="m.strategy">Strategy</span><span data-i18n="m.systems">Design</span><span data-i18n="m.frontend">Hand-built code</span><span data-i18n="m.motion">Domain &amp; email setup</span><span data-i18n="m.perf">Launch &amp; hosting</span><span data-i18n="m.seo">SEO foundations</span><span data-i18n="m.builds">Ongoing care</span><span data-i18n="m.maint">Always in the loop</span>
+    <span data-i18n="m.strategy">Strategy</span><span data-i18n="m.systems">Design</span><span data-i18n="m.frontend">Hand-built code</span><span data-i18n="m.motion">Domain &amp; email setup</span><span data-i18n="m.perf">Launch &amp; hosting</span><span data-i18n="m.seo">SEO foundations</span><span data-i18n="m.builds">Ongoing care</span><span data-i18n="m.maint">Always in the loop</span>
+  </div>
+</div>
+
+<section class="sec" id="approach">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="mono eyebrow" data-i18n="approach.eyebrow">What we do</span>
+      <h2 data-i18n="approach.h2">Everything it takes,<br>under <em>one roof</em>.</h2>
+      <p data-i18n="approach.p">No handing you a pile of logins and wishing you luck. From the first conversation to the live site, it&rsquo;s all us &mdash; and you&rsquo;re in on all of it.</p>
+    </div>
+    <div class="services" data-bp="grid · repeat(3, 1fr) · 1px shared rules">
+      <div class="svc reveal">
+        <span class="mono num">01</span><span class="arrow" aria-hidden="true">↗</span>
+        <h3 data-i18n="svc1.title">Design</h3>
+        <p data-i18n="svc1.p">The look, feel and structure of your site, shaped around your business &mdash; brand direction, layout, the whole visual system. Designed for you, never pulled off a shelf.</p>
+        <ul><li data-i18n="svc1.l1">Brand &amp; visual direction</li><li data-i18n="svc1.l2">Layout &amp; design systems</li><li data-i18n="svc1.l3">No templates, ever</li></ul>
+      </div>
+      <div class="svc reveal">
+        <span class="mono num">02</span><span class="arrow" aria-hidden="true">↗</span>
+        <h3 data-i18n="svc2.title">Build</h3>
+        <p data-i18n="svc2.p">Hand-written code that loads fast and ages well &mdash; plus everything other studios leave to you. Domain, hosting, business email, the whole technical setup: handled. You never touch a dashboard or a DNS record.</p>
+        <ul><li data-i18n="svc2.l1">Custom frontends</li><li data-i18n="svc2.l2">Domain, email &amp; hosting</li><li data-i18n="svc2.l3">Performance &amp; SEO</li></ul>
+      </div>
+      <div class="svc reveal">
+        <span class="mono num">03</span><span class="arrow" aria-hidden="true">↗</span>
+        <h3 data-i18n="svc3.title">Maintain</h3>
+        <p data-i18n="svc3.p">Launch isn&rsquo;t the finish line. We stay on as your technical partner &mdash; keeping the site fast, secure and current with updates, fixes and improvements as your business grows.</p>
+        <ul><li data-i18n="svc3.l1">Ongoing support</li><li data-i18n="svc3.l2">Updates &amp; iteration</li><li data-i18n="svc3.l3">One point of contact</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec advisor">
+  <div class="wrap advisor-inner reveal">
+    <span class="mono eyebrow" data-i18n="adv.eyebrow">No brief? No problem</span>
+    <h2 data-i18n="adv.h2">No clear idea yet?<br>That&rsquo;s <em>the point of us</em>.</h2>
+    <p data-i18n="adv.p">Plenty of people come to us with nothing but a hunch and a business they care about. That&rsquo;s exactly where we do our best work &mdash; asking the right questions, showing you the options, and turning &lsquo;I&rsquo;m not sure&rsquo; into something that feels obviously right.</p>
+  </div>
+</section>
+
+<section class="sec proof" id="proof">
+  <div class="proof-track" id="proofTrack">
+    <div class="proof-sticky">
+      <div class="wrap">
+        <div class="proof-grid">
+          <div class="proof-copy reveal">
+            <span class="mono eyebrow" data-i18n="demo.eyebrow">Proof, not promises</span>
+            <div class="sec-head" style="max-width:none;">
+              <h2 data-i18n="demo.h2">Watch a site <em>come together</em>.</h2>
+              <p data-i18n="demo.p">Our process, compressed into a few seconds. Wireframe to live, every layer in order &mdash; built right here in front of you, the same way we&rsquo;d build yours.</p>
+            </div>
+            <ol class="proof-steps" id="proofSteps">
+              <li><span class="ps-num">01</span><span data-i18n="demo.s1">Wireframe</span><i aria-hidden="true"></i></li>
+              <li><span class="ps-num">02</span><span data-i18n="demo.s2">Type</span><i aria-hidden="true"></i></li>
+              <li><span class="ps-num">03</span><span data-i18n="demo.s3">Colour</span><i aria-hidden="true"></i></li>
+              <li><span class="ps-num">04</span><span data-i18n="demo.s4">Content</span><i aria-hidden="true"></i></li>
+              <li><span class="ps-num">05</span><span data-i18n="demo.s5">Launch</span><i aria-hidden="true"></i></li>
+            </ol>
+            <button class="btn ghost" id="replayBtn" type="button"><span data-i18n="demo.replay">Play it again</span></button>
+            <div class="scrub-hint mono" aria-hidden="true">
+              <span data-i18n="demo.scrub">You build it — just scroll</span>
+              <svg width="11" height="13" viewBox="0 0 12 14" fill="none"><path d="M6 1v11M6 12L2 8M6 12l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="browser reveal" id="demoBrowser" aria-hidden="true" data-bp="demo · scroll-scrubbed stages · no video, no libraries">
+            <div class="b-bar">
+              <i></i><i></i><i></i>
+              <span class="b-url"><span class="b-lock">●</span> yourbakery.hu</span>
+              <span class="b-live" data-i18n="demo.live">Live</span>
+            </div>
+            <div class="b-page">
+              <div class="b-nav"><span class="b-logo"></span><span class="b-links"><i></i><i></i><i></i></span></div>
+              <div class="b-h1" data-i18n="demo.bh1">Baked fresh, daily.</div>
+              <div class="b-line w80"></div>
+              <div class="b-line w60"></div>
+              <div class="b-btn" data-i18n="demo.bbtn">Order now</div>
+              <div class="b-cards"><div class="b-card"></div><div class="b-card"></div><div class="b-card"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="work" style="padding-top:0;">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="mono eyebrow" data-i18n="work.eyebrow">Selected work</span>
+      <h2 data-i18n="work.h2">Built to be <em>seen</em>.</h2>
+      <p data-i18n="work.p">A few representative pieces. Swap these for your real projects as they ship.</p>
+    </div>
+    <!-- WORK ITEMS — replace with your real projects -->
+    <div class="work-grid">
+      <a class="card reveal" data-go="start">
+        <div class="thumb"><div class="thumb-art art-1"></div></div>
+        <div class="body"><div><h3 data-i18n="work1.title">Northwind &mdash; Brand &amp; site</h3><p data-i18n="work1.p">A full identity and marketing site for a renewable-energy startup.</p></div><span class="tag" data-i18n="work1.tag">Design + Build</span></div>
+      </a>
+      <a class="card reveal" data-go="start">
+        <div class="thumb"><div class="thumb-art art-2"></div></div>
+        <div class="body"><div><h3 data-i18n="work2.title">Ledger</h3><p data-i18n="work2.p">A focused product site &amp; docs for a developer tool.</p></div><span class="tag" data-i18n="work2.tag">Engineering</span></div>
+      </a>
+      <a class="card reveal" data-go="start">
+        <div class="thumb"><div class="thumb-art art-3"></div></div>
+        <div class="body"><div><h3 data-i18n="work3.title">Field Studio</h3><p data-i18n="work3.p">A tactile portfolio for an architecture practice.</p></div><span class="tag" data-i18n="work3.tag">Design + Motion</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="sec process" id="process">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="mono eyebrow" data-i18n="process.eyebrow">How we work</span>
+      <h2 data-i18n="process.h2">We build in <em>layers</em>.</h2>
+      <p data-i18n="process.p">You&rsquo;ll always know where things stand &mdash; no black box, no radio silence. Here&rsquo;s how a project moves.</p>
+    </div>
+    <div class="strata" data-bp="strata · staggered scroll reveals">
+      <div class="layer reveal"><span class="lnum">01</span><div><h3 data-i18n="layer1.title">Foundation</h3><p data-i18n="layer1.p">We start by understanding you &mdash; your goals, your customers, what &lsquo;done right&rsquo; actually means to you. Nothing gets built until we&rsquo;re aligned.</p></div><span class="lmeta" data-i18n="layer1.meta">Discovery</span></div>
+      <div class="layer reveal"><span class="lnum">02</span><div><h3 data-i18n="layer2.title">Structure</h3><p data-i18n="layer2.p">We map the whole thing out &mdash; pages, flow, structure &mdash; and agree on it together before a pixel is designed.</p></div><span class="lmeta" data-i18n="layer2.meta">Architecture</span></div>
+      <div class="layer reveal"><span class="lnum">03</span><div><h3 data-i18n="layer3.title">Surface</h3><p data-i18n="layer3.p">Your site comes to life in hand-built code, shared with you as it grows. You see it take shape, not just the final reveal.</p></div><span class="lmeta" data-i18n="layer3.meta">Design + Build</span></div>
+      <div class="layer reveal"><span class="lnum">04</span><div><h3 data-i18n="layer4.title">Launch</h3><p data-i18n="layer4.p">We handle the entire go-live &mdash; domain, email, hosting, the lot. You just watch it appear. Then we stick around.</p></div><span class="lmeta" data-i18n="layer4.meta">Ship + Care</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="studio">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="mono eyebrow" data-i18n="studio.eyebrow">The studio</span>
+      <h2 data-i18n="studio.h2">Small by <em>design</em>.</h2>
+      <p data-i18n="studio.p">Webstrakt is two people who&rsquo;d rather do a handful of things exceptionally than everything adequately. You talk to the people doing the work &mdash; always.</p>
+    </div>
+    <div class="stats" data-bp="grid · repeat(4, 1fr) · counters animate in view">
+      <div class="stat reveal"><div class="big" data-count="100" data-suffix="%">0%</div><div class="lab" data-i18n="stat1.lab">Custom-built, zero templates</div></div>
+      <div class="stat reveal"><div class="big" data-count="2" data-suffix="">0</div><div class="lab" data-i18n="stat2.lab">Founders, hands on every project</div></div>
+      <div class="stat reveal"><div class="big">&lt;1s</div><div class="lab" data-i18n="stat3.lab">Target load time, every page</div></div>
+      <div class="stat reveal"><div class="big">∞</div><div class="lab" data-i18n="stat4.lab">Attention to the small things</div></div>
+    </div>
+    <div class="receipt reveal" id="perfReceipt" hidden><span class="mono" id="perfLine"></span></div>
+  </div>
+</section>
+
+<section class="sec cta" id="contact">
+  <div class="topo"></div>
+  <div class="wrap cta-inner reveal">
+    <h2 data-bp="h2 · Fraunces · italic accent in moss" data-i18n="cta.h2">Let&rsquo;s build something <em>that&rsquo;s yours</em>.</h2>
+    <p data-i18n="cta.p">Tell us what you&rsquo;re picturing &mdash; or just what you&rsquo;re stuck on. We&rsquo;ll take it from there.</p>
+    <a class="btn" data-go="start">
+      <span data-i18n="cta.btn">Start a project</span>
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <span class="email"><span data-i18n="cta.emailpre">or email </span><a href="mailto:hello@webstrakt.com">hello@webstrakt.com</a></span>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" data-go="home">
+          <svg class="mark" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="5" height="15" rx="1.5" fill="#201E1A"/>
+            <rect x="3" y="18" width="5" height="5" rx="1.5" fill="#5E7050"/>
+            <rect x="8" y="18" width="15" height="5" rx="1.5" fill="#948F81"/>
+          </svg>
+          Webstrakt
+        </a>
+        <p data-i18n="foot.tagline">A two-person studio that designs, builds, and handles everything after &mdash; so your website just works.</p>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="foot.menu">Menu</h4>
+        <a href="#approach" data-i18n="nav.approach">Approach</a>
+        <a href="#proof" data-i18n="nav.proof">Proof</a>
+        <a href="#work" data-i18n="nav.work">Work</a>
+        <a href="#process" data-i18n="nav.process">Process</a>
+        <a href="#studio" data-i18n="nav.studio">Studio</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="foot.connect">Connect</h4>
+        <a href="mailto:hello@webstrakt.com" data-i18n="foot.email">Email</a>
+        <a href="#" data-i18n="foot.instagram">Instagram</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span class="mono">© 2025 Webstrakt Studio</span>
+      <span class="studio-status"><i class="pulse" aria-hidden="true"></i><span data-i18n="foot.status">Taking on new projects</span><span class="mono studio-clock" id="studioClock"></span></span>
+      <a class="totop" data-go="home"><span data-i18n="foot.totop">Back to top</span>
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3 7M7 3L11 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+</div><!-- /#home -->
+
+<!-- ============ START A PROJECT (view) ============ -->
+<section id="start" class="startview">
+  <div class="start-main">
+    <div class="topo"></div>
+    <div class="wrap">
+      <div class="grid">
+        <div class="intro">
+          <span class="mono eyebrow" data-i18n="form.eyebrow">Start a project</span>
+          <h1 data-i18n="form.h1">Tell us about your <em>project</em>.</h1>
+          <p data-i18n="form.lead">Fill in a few details and we&rsquo;ll get back to you within two business days. The more you share, the sharper our first reply.</p>
+          <div class="detail">
+            <span class="mono" data-i18n="form.prefer">Prefer email?</span>
+            <a href="mailto:hello@webstrakt.com">hello@webstrakt.com</a>
+          </div>
+        </div>
+        <form id="projectForm">
+          <div class="frow">
+            <div class="field"><label for="name" data-i18n="l.name">Name <span class="req">*</span></label><input id="name" name="name" type="text" required /></div>
+            <div class="field"><label for="email" data-i18n="l.email">Email <span class="req">*</span></label><input id="email" name="email" type="email" required /></div>
+          </div>
+          <div class="field"><label for="company" data-i18n="l.company">Company (optional)</label><input id="company" name="company" type="text" /></div>
+          <div class="frow">
+            <div class="field"><label for="type" data-i18n="l.type">Project type</label>
+              <select id="type" name="type"><option value="" data-i18n="o.choose">Select…</option><option data-i18n="o.landing">Landing / one-page</option><option data-i18n="o.multi">Multi-page site</option><option data-i18n="o.portfolio">Portfolio site</option></select>
+            </div>
+            <div class="field"><label for="budget" data-i18n="l.budget">Budget</label>
+              <select id="budget" name="budget"><option value="" data-i18n="o.choose">Select…</option><option>Under €175</option><option>€175–300</option><option>€300–500</option><option>€500+</option><option data-i18n="o.unsure">Not sure yet</option></select>
+            </div>
+          </div>
+          <div class="field"><label for="timeline" data-i18n="l.timeline">Timeline</label>
+            <select id="timeline" name="timeline"><option value="" data-i18n="o.choose">Select…</option><option data-i18n="o.asap">As soon as possible</option><option data-i18n="o.1to3">1–3 days</option><option data-i18n="o.3plus">3+ days</option><option data-i18n="o.flex">Flexible</option></select>
+          </div>
+          <div class="field"><label for="message" data-i18n="l.message">Tell us more <span class="req">*</span></label><textarea id="message" name="message" required></textarea></div>
+          <div class="form-foot">
+            <button type="button" id="sendBtn" class="btn"><span data-i18n="submit">Send request</span>
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <span class="form-status" id="formStatus" hidden></span>
+          </div>
+        </form>
+
+        <div id="formDone" class="form-done" hidden>
+          <div class="done-check" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h2 id="doneTitle">Message received</h2>
+          <p id="doneMsg">Thanks — we&rsquo;ve got your details and will get back to you within two business days.</p>
+          <div class="done-actions">
+            <button class="btn" data-go="home"><span id="doneHome">Back to home</span></button>
+            <button class="btn ghost" id="sendAnother">Send another</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="wrap">
+      <div class="foot-bottom" style="margin-top:0;border-top:none;">
+        <span class="mono">© 2025 Webstrakt Studio</span>
+        <a class="totop" data-go="home"><span data-i18n="back">Back to home</span></a>
+      </div>
+    </div>
+  </footer>
+</section>
+
+<script>
+  var DICT = {
+    "back":{en:"Back to home",hu:"Vissza a főoldalra"},
+    "nav.work":{en:"Work",hu:"Munkáink"},
+    "nav.approach":{en:"Approach",hu:"Megközelítés"},
+    "nav.process":{en:"Process",hu:"Folyamat"},
+    "nav.studio":{en:"Studio",hu:"A stúdió"},
+    "nav.cta":{en:"Start a project",hu:"Projekt indítása"},
+    "hero.eyebrow":{en:"Design, build, launch &mdash; all of it",hu:"Tervezés, fejlesztés, indítás &mdash; az egész"},
+    "hero.h1":{en:"Built with you.<br>Handled by <em>us</em>.",hu:"Veled együtt építjük.<br>A többit <em>ránk bízhatod</em>."},
+    "hero.lead":{en:"Website builders hand you the work. Agencies take the brief and disappear. We do the whole thing &mdash; design, build, launch, your domain, even your business email &mdash; and keep you in on every decision without burying you in the work.",hu:"A weboldal-építők rád hagyják a munkát. Az ügynökségek elveszik a feladatot, aztán eltűnnek. Mi az egészet elvégezzük &mdash; tervezés, fejlesztés, indítás, a domain, sőt a céges e-mail is &mdash; és minden döntésbe bevonunk, anélkül hogy a munka terhét rád raknánk."},
+    "hero.cta1":{en:"Start a project",hu:"Projekt indítása"},
+    "hero.cta2":{en:"See how it works",hu:"Hogyan működik"},
+    "hero.meta":{en:"Est. 2025 &mdash; Worldwide",hu:"Alapítva 2025 &mdash; Világszerte"},
+    "m.strategy":{en:"Strategy",hu:"Stratégia"},
+    "m.systems":{en:"Design",hu:"Tervezés"},
+    "m.frontend":{en:"Hand-built code",hu:"Kézzel írt kód"},
+    "m.motion":{en:"Domain &amp; email setup",hu:"Domain és e-mail beállítás"},
+    "m.perf":{en:"Launch &amp; hosting",hu:"Indítás és tárhely"},
+    "m.seo":{en:"SEO foundations",hu:"SEO alapok"},
+    "m.builds":{en:"Ongoing care",hu:"Folyamatos gondozás"},
+    "m.maint":{en:"Always in the loop",hu:"Mindig képben"},
+    "approach.eyebrow":{en:"What we do",hu:"Amit csinálunk"},
+    "approach.h2":{en:"Everything it takes,<br>under <em>one roof</em>.",hu:"Minden, ami kell,<br><em>egy helyen</em>."},
+    "approach.p":{en:"No handing you a pile of logins and wishing you luck. From the first conversation to the live site, it&rsquo;s all us &mdash; and you&rsquo;re in on all of it.",hu:"Nem nyomunk a kezedbe egy halom belépési adatot, hogy aztán sok sikert. Az első beszélgetéstől az élő oldalig mindent mi csinálunk &mdash; és te végig képben vagy."},
+    "adv.eyebrow":{en:"No brief? No problem",hu:"Nincs kész terv? Semmi gond"},
+    "adv.h2":{en:"No clear idea yet?<br>That&rsquo;s <em>the point of us</em>.",hu:"Még nincs kész elképzelésed?<br><em>Pont ezért</em> vagyunk."},
+    "adv.p":{en:"Plenty of people come to us with nothing but a hunch and a business they care about. That&rsquo;s exactly where we do our best work &mdash; asking the right questions, showing you the options, and turning &lsquo;I&rsquo;m not sure&rsquo; into something that feels obviously right.",hu:"Sokan úgy jönnek hozzánk, hogy csak egy megérzésük van és egy vállalkozás, ami fontos nekik. Pont itt vagyunk a legjobbak &mdash; feltesszük a jó kérdéseket, megmutatjuk a lehetőségeket, és a &bdquo;nem vagyok benne biztos&rdquo;-ból olyat csinálunk, ami magától értetődően jó."},
+    "svc1.title":{en:"Design",hu:"Dizájn"},
+    "svc1.p":{en:"The look, feel and structure of your site, shaped around your business &mdash; brand direction, layout, the whole visual system. Designed for you, never pulled off a shelf.",hu:"Az oldalad megjelenése, hangulata és felépítése &mdash; a vállalkozásodra szabva. Márkairány, elrendezés, a teljes vizuális rendszer. Neked tervezve, soha nem polcról leemelve."},
+    "svc1.l1":{en:"Brand &amp; visual direction",hu:"Márka és vizuális irány"},
+    "svc1.l2":{en:"Layout &amp; design systems",hu:"Elrendezés és dizájnrendszerek"},
+    "svc1.l3":{en:"No templates, ever",hu:"Soha semmi sablon"},
+    "svc2.title":{en:"Build",hu:"Fejlesztés"},
+    "svc2.p":{en:"Hand-written code that loads fast and ages well &mdash; plus everything other studios leave to you. Domain, hosting, business email, the whole technical setup: handled. You never touch a dashboard or a DNS record.",hu:"Kézzel írt kód, amely gyorsan tölt és jól öregszik &mdash; és mindaz, amit más stúdiók rád hagynak. Domain, tárhely, céges e-mail, a teljes technikai beállítás: elintézve. Egyetlen vezérlőpultot vagy DNS-rekordot sem kell megérintened."},
+    "svc2.l1":{en:"Custom frontends",hu:"Egyedi frontendek"},
+    "svc2.l2":{en:"Domain, email &amp; hosting",hu:"Domain, e-mail és tárhely"},
+    "svc2.l3":{en:"Performance &amp; SEO",hu:"Teljesítmény és SEO"},
+    "svc3.title":{en:"Maintain",hu:"Karbantartás"},
+    "svc3.p":{en:"Launch isn&rsquo;t the finish line. We stay on as your technical partner &mdash; keeping the site fast, secure and current with updates, fixes and improvements as your business grows.",hu:"Az indítás nem a célvonal. Technikai partnerként veled maradunk &mdash; az oldal gyors, biztonságos és naprakész marad: frissítések, javítások és fejlesztések, ahogy a vállalkozásod növekszik."},
+    "svc3.l1":{en:"Ongoing support",hu:"Folyamatos támogatás"},
+    "svc3.l2":{en:"Updates &amp; iteration",hu:"Frissítések és fejlesztés"},
+    "svc3.l3":{en:"One point of contact",hu:"Egyetlen kapcsolattartó"},
+    "work.eyebrow":{en:"Selected work",hu:"Válogatott munkák"},
+    "work.h2":{en:"Built to be <em>seen</em>.",hu:"Arra építve, hogy <em>lássák</em>."},
+    "work.p":{en:"A few representative pieces. Swap these for your real projects as they ship.",hu:"Néhány jellemző példa. Cseréld ezeket valódi projektekre, ahogy elkészülnek."},
+    "work1.title":{en:"Northwind &mdash; Brand &amp; site",hu:"Northwind &mdash; Márka és weboldal"},
+    "work1.p":{en:"A full identity and marketing site for a renewable-energy startup.",hu:"Teljes arculat és marketingoldal egy megújulóenergia-startupnak."},
+    "work1.tag":{en:"Design + Build",hu:"Dizájn + Fejlesztés"},
+    "work2.title":{en:"Ledger",hu:"Ledger"},
+    "work2.p":{en:"A focused product site &amp; docs for a developer tool.",hu:"Fókuszált termékoldal és dokumentáció egy fejlesztői eszközhöz."},
+    "work2.tag":{en:"Engineering",hu:"Fejlesztés"},
+    "work3.title":{en:"Field Studio",hu:"Field Studio"},
+    "work3.p":{en:"A tactile portfolio for an architecture practice.",hu:"Tapintható portfólió egy építészirodának."},
+    "work3.tag":{en:"Design + Motion",hu:"Dizájn + Mozgás"},
+    "process.eyebrow":{en:"How we work",hu:"Hogyan dolgozunk"},
+    "process.h2":{en:"We build in <em>layers</em>.",hu:"<em>Rétegekben</em> építkezünk."},
+    "process.p":{en:"You&rsquo;ll always know where things stand &mdash; no black box, no radio silence. Here&rsquo;s how a project moves.",hu:"Mindig tudni fogod, hol tart a projekt &mdash; nincs fekete doboz, nincs néma csend. Így halad egy munka."},
+    "layer1.title":{en:"Foundation",hu:"Alapozás"},
+    "layer1.p":{en:"We start by understanding you &mdash; your goals, your customers, what &lsquo;done right&rsquo; actually means to you. Nothing gets built until we&rsquo;re aligned.",hu:"Azzal kezdjük, hogy megértünk téged &mdash; a céljaidat, az ügyfeleidet, és hogy számodra mit jelent a &bdquo;jól megcsinálva&rdquo;. Semmit nem építünk, amíg nem vagyunk egy hullámhosszon."},
+    "layer1.meta":{en:"Discovery",hu:"Felfedezés"},
+    "layer2.title":{en:"Structure",hu:"Szerkezet"},
+    "layer2.p":{en:"We map the whole thing out &mdash; pages, flow, structure &mdash; and agree on it together before a pixel is designed.",hu:"Felvázoljuk az egészet &mdash; oldalak, útvonal, szerkezet &mdash;, és közösen jóváhagyjuk, mielőtt egyetlen pixel is megszületne."},
+    "layer2.meta":{en:"Architecture",hu:"Architektúra"},
+    "layer3.title":{en:"Surface",hu:"Felszín"},
+    "layer3.p":{en:"Your site comes to life in hand-built code, shared with you as it grows. You see it take shape, not just the final reveal.",hu:"Az oldalad kézzel írt kódban kel életre, és menet közben végig megmutatjuk. Látod, ahogy formálódik &mdash; nem csak a kész végeredményt."},
+    "layer3.meta":{en:"Design + Build",hu:"Dizájn + Fejlesztés"},
+    "layer4.title":{en:"Launch",hu:"Indítás"},
+    "layer4.p":{en:"We handle the entire go-live &mdash; domain, email, hosting, the lot. You just watch it appear. Then we stick around.",hu:"A teljes élesítést mi intézzük &mdash; domain, e-mail, tárhely, minden. Te csak nézed, ahogy megjelenik. Aztán is melletted maradunk."},
+    "layer4.meta":{en:"Ship + Care",hu:"Indítás + Gondozás"},
+    "studio.eyebrow":{en:"The studio",hu:"A stúdió"},
+    "studio.h2":{en:"Small by <em>design</em>.",hu:"Szándékosan <em>kicsi</em>."},
+    "studio.p":{en:"Webstrakt is two people who&rsquo;d rather do a handful of things exceptionally than everything adequately. You talk to the people doing the work &mdash; always.",hu:"A Webstrakt két ember, akik inkább néhány dolgot csinálnak kivételesen, mint mindent éppen csak elfogadhatóan. Mindig azokkal beszélsz, akik a munkát végzik."},
+    "stat1.lab":{en:"Custom-built, zero templates",hu:"Egyedi fejlesztés, nulla sablon"},
+    "stat2.lab":{en:"Founders, hands on every project",hu:"Alapító, jelen minden projektben"},
+    "stat3.lab":{en:"Target load time, every page",hu:"Cél betöltési idő, minden oldalon"},
+    "stat4.lab":{en:"Attention to the small things",hu:"Figyelem az apró részletekre"},
+    "cta.h2":{en:"Let&rsquo;s build something <em>that&rsquo;s yours</em>.",hu:"Építsünk valamit, <em>ami a tiéd</em>."},
+    "cta.p":{en:"Tell us what you&rsquo;re picturing &mdash; or just what you&rsquo;re stuck on. We&rsquo;ll take it from there.",hu:"Meséld el, mit képzelsz el &mdash; vagy csak azt, hol akadtál el. A többit elintézzük."},
+    "cta.btn":{en:"Start a project",hu:"Projekt indítása"},
+    "cta.emailpre":{en:"or email ",hu:"vagy írj e-mailt: "},
+    "foot.tagline":{en:"A two-person studio that designs, builds, and handles everything after &mdash; so your website just works.",hu:"Kétfős stúdió, amely tervez, fejleszt és utána is mindent elintéz &mdash; hogy a weboldalad egyszerűen csak működjön."},
+    "foot.menu":{en:"Menu",hu:"Menü"},
+    "foot.connect":{en:"Connect",hu:"Kapcsolat"},
+    "foot.email":{en:"Email",hu:"E-mail"},
+    "foot.instagram":{en:"Instagram",hu:"Instagram"},
+    "foot.totop":{en:"Back to top",hu:"Vissza a tetejére"},
+    "foot.status":{en:"Taking on new projects",hu:"Új projekteket vállalunk"},
+    "spine.top":{en:"Top",hu:"Eleje"},
+    "spine.contact":{en:"Contact",hu:"Kapcsolat"},
+    "nav.proof":{en:"Proof",hu:"Demó"},
+    "demo.eyebrow":{en:"Proof, not promises",hu:"Bizonyíték, nem ígéret"},
+    "demo.h2":{en:"Watch a site <em>come together</em>.",hu:"Nézd, ahogy egy oldal <em>összeáll</em>."},
+    "demo.p":{en:"Our process, compressed into a few seconds. Wireframe to live, every layer in order &mdash; built right here in front of you, the same way we&rsquo;d build yours.",hu:"A folyamatunk, néhány másodpercbe sűrítve. Drótváztól az élesítésig, rétegről rétegre &mdash; itt épül fel a szemed előtt, pont úgy, ahogy a tiédet is építenénk."},
+    "demo.s1":{en:"Wireframe",hu:"Drótváz"},
+    "demo.s2":{en:"Type",hu:"Tipográfia"},
+    "demo.s3":{en:"Colour",hu:"Szín"},
+    "demo.s4":{en:"Content",hu:"Tartalom"},
+    "demo.s5":{en:"Launch",hu:"Indítás"},
+    "demo.replay":{en:"Play it again",hu:"Játszd le újra"},
+    "demo.scrub":{en:"You build it — just scroll",hu:"Te építed — csak görgess"},
+    "demo.live":{en:"Live",hu:"Élő"},
+    "demo.bh1":{en:"Baked fresh, daily.",hu:"Naponta frissen sütve."},
+    "demo.bbtn":{en:"Order now",hu:"Rendelj most"},
+    "perf.line":{en:"This page · hand-coded · zero frameworks · {kb} kB · loaded in {ms} ms",hu:"Ez az oldal · kézzel kódolva · nulla keretrendszer · {kb} kB · {ms} ms alatt betöltve"},
+    "form.eyebrow":{en:"Start a project",hu:"Projekt indítása"},
+    "form.h1":{en:"Tell us about your <em>project</em>.",hu:"Mesélj a <em>projektedről</em>."},
+    "form.lead":{en:"Fill in a few details and we&rsquo;ll get back to you within two business days. The more you share, the sharper our first reply.",hu:"Adj meg néhány részletet, és két munkanapon belül jelentkezünk. Minél többet osztasz meg, annál pontosabb lesz az első válaszunk."},
+    "form.prefer":{en:"Prefer email?",hu:"Inkább e-mailben?"},
+    "l.name":{en:"Name <span class='req'>*</span>",hu:"Név <span class='req'>*</span>"},
+    "l.email":{en:"Email <span class='req'>*</span>",hu:"E-mail <span class='req'>*</span>"},
+    "l.company":{en:"Company (optional)",hu:"Cég (opcionális)"},
+    "l.type":{en:"Project type",hu:"Projekt típusa"},
+    "l.budget":{en:"Budget",hu:"Költségvetés"},
+    "l.timeline":{en:"Timeline",hu:"Időkeret"},
+    "l.message":{en:"Tell us more <span class='req'>*</span>",hu:"Mesélj többet <span class='req'>*</span>"},
+    "o.choose":{en:"Select…",hu:"Válassz…"},
+    "o.landing":{en:"Landing / one-page",hu:"Landing / egyoldalas"},
+    "o.multi":{en:"Multi-page site",hu:"Többoldalas oldal"},
+    "o.portfolio":{en:"Portfolio site",hu:"Portfólió oldal"},
+    "o.unsure":{en:"Not sure yet",hu:"Még nem tudom"},
+    "o.asap":{en:"As soon as possible",hu:"Mielőbb"},
+    "o.1to3":{en:"1–3 days",hu:"1–3 nap"},
+    "o.3plus":{en:"3+ days",hu:"3+ nap"},
+    "o.flex":{en:"Flexible",hu:"Rugalmas"},
+    "submit":{en:"Send request",hu:"Kérés elküldése"},
+    "status.sending":{en:"Sending…",hu:"Küldés…"},
+    "status.required":{en:"Please fill in your name, email, and a short message.",hu:"Kérjük, add meg a neved, az e-mail-címed és egy rövid üzenetet."},
+    "status.bademail":{en:"That email address doesn&rsquo;t look right — please check it.",hu:"Ez az e-mail-cím nem tűnik helyesnek — kérjük, ellenőrizd."},
+    "status.ok":{en:"Thanks — your message is on its way. We&rsquo;ll be in touch soon.",hu:"Köszönjük — az üzeneted úton van. Hamarosan jelentkezünk."},
+    "status.fail":{en:"Couldn&rsquo;t send automatically.",hu:"Nem sikerült automatikusan elküldeni."},
+    "status.faillink":{en:"Email us directly instead.",hu:"Írj nekünk közvetlenül."},
+    "done.title":{en:"Message received",hu:"Megkaptuk az üzeneted"},
+    "done.body":{en:"Thanks, {name} — we&rsquo;ve got your details and will get back to you within two business days.",hu:"Köszönjük, {name} — megkaptuk az adataidat, és két munkanapon belül jelentkezünk."},
+    "done.another":{en:"Send another",hu:"Új üzenet küldése"}
+  };
+
+  var currentLang = "en";
+  function applyLang(lang){
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(function(el){
+      var k = el.getAttribute("data-i18n");
+      if(DICT[k] && DICT[k][lang] != null) el.innerHTML = DICT[k][lang];
+    });
+    document.querySelectorAll(".lang-btn").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-lang") === lang); });
+    if(typeof renderDone === "function"){ var fd = document.getElementById("formDone"); if(fd && !fd.hidden) renderDone(); }
+    if(typeof renderPerf === "function") renderPerf();
+  }
+  document.querySelectorAll(".lang-btn").forEach(function(b){ b.addEventListener("click", function(){ applyLang(b.getAttribute("data-lang")); }); });
+
+  /* ---------- surveyor spine (built before applyLang + anchor binding) ---------- */
+  (function(){
+    var spineEl = document.getElementById("spine");
+    if(!spineEl) return;
+    var stops = [["#top","spine.top"],["#approach","nav.approach"],["#proof","nav.proof"],["#process","nav.process"],["#studio","nav.studio"],["#contact","spine.contact"]];
+    spineEl.innerHTML = stops.map(function(s){
+      return '<a href="'+s[0]+'"><span class="lbl" data-i18n="'+s[1]+'"></span><span class="tick" aria-hidden="true"></span></a>';
+    }).join("");
+  })();
+
+  applyLang(new URLSearchParams(location.search).get("lang") === "hu" ? "hu" : "en");
+
+  /* ---------- view switching (home <-> start), wrapped in the strata wipe ---------- */
+  var overlay = document.getElementById("overlay");
+  var wipe = document.getElementById("wipe"), wiping = false;
+  function runWipe(swap){
+    if(!wipe || wiping || window.matchMedia("(prefers-reduced-motion: reduce)").matches){ swap(); return; }
+    wiping = true;
+    wipe.classList.remove("out"); wipe.classList.add("in");
+    setTimeout(function(){
+      swap();
+      wipe.classList.remove("in"); wipe.classList.add("out");
+      setTimeout(function(){ wipe.classList.remove("out"); wiping = false; }, 580);
+    }, 500);
+  }
+  function _showStart(){ document.body.classList.add("show-start"); overlay.classList.remove("open"); window.scrollTo({top:0,behavior:"auto"}); }
+  function _showHome(scrollSel){
+    document.body.classList.remove("show-start"); overlay.classList.remove("open");
+    if(scrollSel && scrollSel !== "#top"){
+      var t = document.querySelector(scrollSel);
+      if(t){ requestAnimationFrame(function(){ window.scrollTo({top:t.getBoundingClientRect().top + window.scrollY - 76, behavior:"smooth"}); }); return; }
+    }
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+  function showStart(){ if(document.body.classList.contains("show-start")){ _showStart(); return; } runWipe(_showStart); }
+  function showHome(scrollSel){ if(!document.body.classList.contains("show-start")){ _showHome(scrollSel); return; } runWipe(function(){ _showHome(scrollSel); }); }
+
+  document.querySelectorAll('[data-go="start"]').forEach(function(el){
+    el.addEventListener("click", function(e){ e.preventDefault(); showStart(); });
+  });
+  document.querySelectorAll('[data-go="home"]').forEach(function(el){
+    el.addEventListener("click", function(e){ e.preventDefault(); showHome(); });
+  });
+
+  /* in-page anchor links (also work from the start view) */
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener("click", function(e){
+      var id = a.getAttribute("href");
+      if(id === "#" || id === "#start") return;
+      e.preventDefault();
+      if(document.body.classList.contains("show-start")){ showHome(id); return; }
+      overlay.classList.remove("open");
+      if(id === "#top"){ window.scrollTo({top:0,behavior:"smooth"}); return; }
+      var t = document.querySelector(id);
+      if(t){ window.scrollTo({top:t.getBoundingClientRect().top + window.scrollY - 76, behavior:"smooth"}); }
+    });
+  });
+
+  /* ---------- load + reveals ---------- */
+  document.body.classList.add("loaded");
+  window.addEventListener("load", function(){ document.body.classList.add("loaded"); });
+
+  var header = document.getElementById("header");
+  function onScroll(){ header.classList.toggle("scrolled", window.scrollY > 24); }
+  onScroll(); window.addEventListener("scroll", onScroll, {passive:true});
+
+  document.getElementById("menuToggle").addEventListener("click", function(){ overlay.classList.add("open"); });
+  document.getElementById("closeMenu").addEventListener("click", function(){ overlay.classList.remove("open"); });
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, {threshold:.14, rootMargin:"0px 0px -8% 0px"});
+  document.querySelectorAll(".reveal").forEach(function(el){ io.observe(el); });
+
+  var cio = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el = e.target, target = +el.getAttribute("data-count"), suffix = el.getAttribute("data-suffix") || "";
+      var cur = 0, step = Math.max(1, Math.round(target/40));
+      (function tick(){ cur = Math.min(target, cur+step); el.textContent = cur+suffix; if(cur<target) requestAnimationFrame(tick); })();
+      cio.unobserve(el);
+    });
+  }, {threshold:.6});
+  document.querySelectorAll("[data-count]").forEach(function(el){ cio.observe(el); });
+
+  var topos = document.querySelectorAll(".hero .topo");
+  window.addEventListener("mousemove", function(ev){
+    var dx = (ev.clientX/window.innerWidth - .5), dy = (ev.clientY/window.innerHeight - .5);
+    topos.forEach(function(t,i){ var k = (i+1)*16; t.style.translate = (-dx*k)+"px "+(-dy*k)+"px"; });
+  });
+
+  /* ---------- spine tracking (active section + dark-section mode) ---------- */
+  var spineEl = document.getElementById("spine");
+  var spineLinks = spineEl ? Array.prototype.slice.call(spineEl.querySelectorAll("a")) : [];
+  var processSec = document.getElementById("process");
+  function spineScroll(){
+    if(!spineEl || document.body.classList.contains("show-start")) return;
+    var probe = window.scrollY + window.innerHeight * .42, onIdx = 0;
+    spineLinks.forEach(function(a,i){
+      var t = document.querySelector(a.getAttribute("href"));
+      if(t && (t.getBoundingClientRect().top + window.scrollY) <= probe) onIdx = i;
+    });
+    spineLinks.forEach(function(a,i){ a.classList.toggle("on", i === onIdx); });
+    if(processSec){
+      var r = processSec.getBoundingClientRect(), mid = window.innerHeight/2;
+      spineEl.classList.toggle("on-dark", r.top < mid && r.bottom > mid);
+    }
+  }
+  spineScroll(); window.addEventListener("scroll", spineScroll, {passive:true});
+  window.addEventListener("resize", spineScroll, {passive:true});
+
+  /* ---------- magnetic buttons (fine pointers only, motion respected) ---------- */
+  if(window.matchMedia("(pointer:fine)").matches && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    document.querySelectorAll(".btn").forEach(function(b){
+      b.addEventListener("mousemove", function(ev){
+        var r = b.getBoundingClientRect();
+        var dx = (ev.clientX - r.left - r.width/2) / r.width;
+        var dy = (ev.clientY - r.top - r.height/2) / r.height;
+        b.style.transform = "translate(" + (dx*7).toFixed(1) + "px," + (dy*5 - 2).toFixed(1) + "px)";
+      });
+      b.addEventListener("mouseleave", function(){ b.style.transform = ""; });
+    });
+  }
+
+  /* ---------- studio clock (Budapest local time, footer) ---------- */
+  var studioClock = document.getElementById("studioClock");
+  function tickClock(){
+    if(!studioClock) return;
+    try{
+      studioClock.textContent = "BUD " + new Intl.DateTimeFormat("en-GB", {hour:"2-digit", minute:"2-digit", timeZone:"Europe/Budapest"}).format(new Date());
+    }catch(e){ studioClock.textContent = ""; }
+  }
+  tickClock(); setInterval(tickClock, 30000);
+
+  /* ---------- proof demo — scroll-scrubbed build (fallback: autoplay + replay) ---------- */
+  var proofSec = document.getElementById("proof");
+  var proofTrack = document.getElementById("proofTrack");
+  var proofSteps = proofSec ? proofSec.querySelectorAll(".proof-steps li") : [];
+  var scrubMQ = window.matchMedia("(min-width:981px) and (min-height:561px) and (prefers-reduced-motion: no-preference)");
+  function isScrub(){ return scrubMQ.matches && !!proofTrack; }
+
+  function setStageCount(n){
+    if(!proofSec) return;
+    for(var i = 1; i <= 5; i++){
+      proofSec.classList.toggle("s" + i, i <= n);
+      if(proofSteps[i-1]) proofSteps[i-1].classList.toggle("on", i <= n);
+    }
+  }
+
+  /* scrub mode: map track scroll progress (0–1) to cumulative stages, both directions */
+  function scrubUpdate(){
+    if(!isScrub() || !proofSec || document.body.classList.contains("show-start")) return;
+    var r = proofTrack.getBoundingClientRect();
+    var total = r.height - window.innerHeight;
+    if(total <= 0) return;
+    var p = Math.min(1, Math.max(0, -r.top / total));
+    var th = [.06, .26, .46, .66, .86], n = 0;
+    th.forEach(function(t){ if(p >= t) n++; });
+    setStageCount(n);
+  }
+  window.addEventListener("scroll", scrubUpdate, {passive:true});
+  window.addEventListener("resize", scrubUpdate, {passive:true});
+  scrubUpdate();
+
+  /* fallback mode: timed autoplay when scrolled into view, plus replay button */
+  var proofTimers = [];
+  function playProof(){
+    if(!proofSec || isScrub()) return;
+    proofTimers.forEach(clearTimeout); proofTimers = [];
+    setStageCount(0);
+    void proofSec.offsetWidth; /* reflow so transitions restart cleanly */
+    var times = [250, 1600, 2800, 4000, 5300];
+    var rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    times.forEach(function(t, i){
+      var fn = function(){ setStageCount(i + 1); };
+      if(rm){ fn(); } else { proofTimers.push(setTimeout(fn, t)); }
+    });
+  }
+  if(proofSec){
+    var pio = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting && !isScrub()){ playProof(); pio.unobserve(e.target); }
+      });
+    }, {threshold:.35});
+    pio.observe(proofSec);
+  }
+  var replayBtn = document.getElementById("replayBtn");
+  if(replayBtn){ replayBtn.addEventListener("click", playProof); }
+  if(scrubMQ.addEventListener){ scrubMQ.addEventListener("change", function(){ if(isScrub()){ scrubUpdate(); } else { setStageCount(5); } }); }
+
+  /* ---------- perf receipt — real measured numbers for this very page ---------- */
+  var perfVals = null;
+  function renderPerf(){
+    var line = document.getElementById("perfLine"), box = document.getElementById("perfReceipt");
+    if(!line || !box || !perfVals || !DICT["perf.line"]) return;
+    line.textContent = DICT["perf.line"][currentLang].replace("{kb}", perfVals.kb).replace("{ms}", perfVals.ms);
+    box.hidden = false;
+  }
+  function measurePerf(){
+    try{
+      var nav = performance.getEntriesByType("navigation")[0];
+      var ms = nav ? Math.round(nav.loadEventEnd || nav.domContentLoadedEventEnd || 0) : 0;
+      var bytes = nav ? (nav.transferSize || nav.encodedBodySize || 0) : 0;
+      if(!bytes) bytes = document.documentElement.outerHTML.length;
+      var kb = Math.max(1, Math.round(bytes / 1024));
+      if(ms > 0 && ms < 60000){ perfVals = {kb:kb, ms:ms}; renderPerf(); }
+    }catch(e){}
+  }
+  window.addEventListener("load", function(){ setTimeout(measurePerf, 0); });
+
+  /* a small note for anyone who looks under the hood */
+  try{
+    console.log("%cWebstrakt%c — hand-built, no templates.\nView source welcome: every line here was written on purpose.\nhello@webstrakt.com", "font-family:Georgia,serif;font-size:16px;font-style:italic;", "color:#5E7050;");
+  }catch(e){}
+
+  /* ---------- form submit (FormSubmit — no account needed) ---------- */
+  var STUDIO_EMAIL = "hello@webstrakt.com";
+  var ENDPOINT = "https://formsubmit.co/ajax/" + STUDIO_EMAIL;
+  var form = document.getElementById("projectForm");
+  var status = document.getElementById("formStatus");
+  var submitBtn = document.getElementById("sendBtn");
+
+  function setStatus(html, kind){
+    status.hidden = false;
+    status.className = "form-status" + (kind ? " " + kind : "");
+    status.innerHTML = html;
+  }
+  function val(id){ var el = document.getElementById(id); return el ? el.value.toString().trim() : ""; }
+  function buildMailto(g){
+    var lines = ["Name: "+g("name"),"Email: "+g("email"),"Company: "+g("company"),"Project type: "+g("type"),"Budget: "+g("budget"),"Timeline: "+g("timeline"),"",g("message")];
+    return "mailto:"+STUDIO_EMAIL+"?subject="+encodeURIComponent("New project enquiry — "+(g("name")||"Webstrakt"))+"&body="+encodeURIComponent(lines.join("\n"));
+  }
+
+  var formDone = document.getElementById("formDone");
+  var submittedName = "";
+  function renderDone(){
+    document.getElementById("doneTitle").innerHTML = DICT["done.title"][currentLang];
+    var tpl = DICT["done.body"][currentLang];
+    var msg = submittedName ? tpl.replace("{name}", submittedName) : tpl.replace(", {name}", "").replace("{name}", "");
+    document.getElementById("doneMsg").innerHTML = msg;
+    document.getElementById("doneHome").innerHTML = DICT["back"][currentLang];
+    document.getElementById("sendAnother").innerHTML = DICT["done.another"][currentLang];
+  }
+  function showDone(name){
+    submittedName = name || "";
+    form.hidden = true;
+    formDone.hidden = false;
+    renderDone();
+    window.scrollTo({ top:0, behavior:"smooth" });
+  }
+  document.getElementById("sendAnother").addEventListener("click", function(){
+    formDone.hidden = true;
+    form.hidden = false;
+    status.hidden = true;
+    submitBtn.disabled = false;
+  });
+
+  submitBtn.addEventListener("click", function(){
+    var g = function(k){ return val(k); };
+
+    if(!g("name") || !g("email") || !g("message")){
+      setStatus(DICT["status.required"][currentLang], "warn");
+      return;
+    }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(g("email"))){
+      setStatus(DICT["status.bademail"][currentLang], "warn");
+      return;
+    }
+
+    setStatus(DICT["status.sending"][currentLang], "");
+    submitBtn.disabled = true;
+
+    var payload = {
+      name: g("name"), email: g("email"), company: g("company"),
+      type: g("type"), budget: g("budget"), timeline: g("timeline"),
+      message: g("message"),
+      _subject: "New project enquiry — " + (g("name") || "Webstrakt"),
+      _replyto: g("email"), _captcha: "false", _template: "table"
+    };
+
+    var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    var timer = setTimeout(function(){ if(ctrl) ctrl.abort(); }, 10000);
+
+    fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload),
+      signal: ctrl ? ctrl.signal : undefined
+    })
+    .then(function(r){ if(!r.ok) throw new Error("http"); return r.json().catch(function(){ return {}; }); })
+    .then(function(){ var nm = g("name"); form.reset(); showDone(nm); })
+    .catch(function(){
+      var link = '<a href="' + buildMailto(g) + '" style="color:inherit;text-decoration:underline;">' + DICT["status.faillink"][currentLang] + '</a>';
+      setStatus(DICT["status.fail"][currentLang] + " " + link, "warn");
+    })
+    .then(function(){ clearTimeout(timer); submitBtn.disabled = false; });
+  });
+</script>
+
+<!-- Vercel Web Analytics -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
