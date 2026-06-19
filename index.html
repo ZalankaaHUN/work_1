@@ -946,8 +946,9 @@
     el.addEventListener("click", function(e){ e.preventDefault(); showHome(); });
   });
 
-  /* in-page anchor links (also work from the start view) */
+  /* in-page anchor links (also work from the start view) — spine links are handled separately below */
   document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    if(a.closest("#spine")) return;
     a.addEventListener("click", function(e){
       var id = a.getAttribute("href");
       if(id === "#" || id === "#start") return;
@@ -1013,13 +1014,15 @@
   spineScroll(); window.addEventListener("scroll", spineScroll, {passive:true});
   window.addEventListener("resize", spineScroll, {passive:true});
 
-  /* ---------- spine-nav scrub suppression ----------
-     Jumping between sections via the right-side spine often has to glide straight
-     through the tall proof scroll-track. Left alone, the regular scroll listener
-     would catch every frame of that transit and play the build animation along
-     the way, making the jump feel janky instead of smooth. While a spine click is
-     in flight we pause that listener, then resync it once the scroll settles —
-     normal mouse/trackpad scrolling through the proof section is untouched. */
+  /* ---------- spine-nav: jump between sections, skipping over the proof track ----------
+     The proof demo sits in a very tall track with a sticky-pinned stage inside it —
+     that's what drives the build-as-you-scroll effect. A native smooth scroll that
+     happens to pass through that track has to travel its full height while the
+     pinned stage just sits there on screen, which is what makes a spine jump feel
+     like it stalls. Instead: smooth-scroll up to the edge of the track, jump straight
+     across it in one frame (no animation, no build stages playing), then smooth-scroll
+     the rest of the way. Regular scrolling through the proof section is untouched —
+     this logic only runs for clicks on the right-side spine. */
   var spineNavActive = false, spineNavTimer = null;
   function spineNavSettle(){
     spineNavActive = false;
@@ -1031,11 +1034,55 @@
     spineNavTimer = setTimeout(spineNavSettle, 140);
   }
   window.addEventListener("scroll", spineNavWatch, {passive:true});
+
+  function kickSettleTimer(){
+    spineNavActive = true;
+    clearTimeout(spineNavTimer);
+    spineNavTimer = setTimeout(spineNavSettle, 140);
+  }
+  function waitUntilScrollY(target, cb){
+    var n = 0;
+    (function step(){
+      n++;
+      if(Math.abs(window.scrollY - target) < 2 || n > 240){ cb(); return; }
+      requestAnimationFrame(step);
+    })();
+  }
+  function spineGoTo(destY){
+    var curY = window.scrollY;
+    var maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    destY = Math.max(0, Math.min(destY, maxY));
+    if(!proofTrack){ kickSettleTimer(); window.scrollTo({top:destY, behavior:"smooth"}); return; }
+    var pr = proofTrack.getBoundingClientRect();
+    var proofTop = pr.top + curY, proofBottom = proofTop + pr.height;
+    var lo = Math.min(curY, destY), hi = Math.max(curY, destY);
+    var crosses = hi > proofTop + 4 && lo < proofBottom - 4;
+    if(!crosses){ kickSettleTimer(); window.scrollTo({top:destY, behavior:"smooth"}); return; }
+    var goingDown = destY >= curY;
+    var entry = goingDown ? Math.max(curY, proofTop) : Math.min(curY, proofBottom);
+    var exit  = goingDown ? Math.min(destY, proofBottom) : Math.max(destY, proofTop);
+    function finish(){ kickSettleTimer(); window.scrollTo({top:destY, behavior:"smooth"}); }
+    function jumpAcross(){
+      window.scrollTo({top:exit, behavior:"auto"});
+      requestAnimationFrame(function(){ requestAnimationFrame(finish); });
+    }
+    kickSettleTimer();
+    if(Math.abs(curY - entry) > 2){
+      window.scrollTo({top:entry, behavior:"smooth"});
+      waitUntilScrollY(entry, jumpAcross);
+    } else {
+      jumpAcross();
+    }
+  }
   spineLinks.forEach(function(a){
-    a.addEventListener("click", function(){
-      spineNavActive = true;
-      clearTimeout(spineNavTimer);
-      spineNavTimer = setTimeout(spineNavSettle, 140);
+    a.addEventListener("click", function(e){
+      var id = a.getAttribute("href");
+      e.preventDefault();
+      if(document.body.classList.contains("show-start")){ showHome(id); return; }
+      overlay.classList.remove("open");
+      if(id === "#top"){ spineGoTo(0); return; }
+      var t = document.querySelector(id);
+      if(t){ spineGoTo(t.getBoundingClientRect().top + window.scrollY - 76); }
     });
   });
 
