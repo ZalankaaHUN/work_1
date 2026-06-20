@@ -3,24 +3,25 @@
 // Vercel serverless function. Called by the "Start a project" form instead of
 // posting straight to FormSubmit. It:
 //   1. Validates the submission server-side.
-//   2. Asks gpt-4o-mini to summarise it, flag missing/unclear info, suggest a
+//   2. Asks Gemini to summarise it, flag missing/unclear info, suggest a
 //      plan/budget/subscription fit, and draft a reply.
 //   3. Forwards the original submission + that AI review to hello@webstrakt.com
 //      via FormSubmit (the same destination the form already used — no new
 //      email provider or signup needed).
 //
 // Requires one environment variable, set in the Vercel project settings:
-//   OPENAI_API_KEY = sk-...
+//   GEMINI_API_KEY = your Google AI Studio API key
 //
 // If the AI call fails for any reason (no key, rate limit, bad response), the
 // function still forwards the raw enquiry so no lead is ever lost — it just
 // notes that the AI review wasn't available for that one.
 
-const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+const GEMINI_MODEL = "gemini-2.5-flash"; // swap to "gemini-flash-latest" if you'd rather always track Google's newest flash model
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent";
 const FORM_ENDPOINT = "https://formsubmit.co/ajax/hello@webstrakt.com";
 
 async function getAiReview(fields) {
-  if (!process.env.OPENAI_API_KEY) throw new Error("missing_key");
+  if (!process.env.GEMINI_API_KEY) throw new Error("missing_key");
 
   const prompt = [
     "You are reviewing a new project enquiry submitted to a small web design studio called Webstrakt.",
@@ -40,17 +41,18 @@ async function getAiReview(fields) {
 
   let r;
   try {
-    r = await fetch(OPENAI_URL, {
+    r = await fetch(GEMINI_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + process.env.OPENAI_API_KEY,
+        "x-goog-api-key": process.env.GEMINI_API_KEY,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        response_format: { type: "json_object" },
-        temperature: 0.4,
-        messages: [{ role: "user", content: prompt }],
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.4,
+          responseMimeType: "application/json",
+        },
       }),
       signal: controller.signal,
     });
@@ -58,10 +60,17 @@ async function getAiReview(fields) {
     clearTimeout(timer);
   }
 
-  if (!r.ok) throw new Error("openai_http_" + r.status);
+  if (!r.ok) throw new Error("gemini_http_" + r.status);
   const data = await r.json();
-  const text = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-  if (!text) throw new Error("openai_empty");
+  const text =
+    data &&
+    data.candidates &&
+    data.candidates[0] &&
+    data.candidates[0].content &&
+    data.candidates[0].content.parts &&
+    data.candidates[0].content.parts[0] &&
+    data.candidates[0].content.parts[0].text;
+  if (!text) throw new Error("gemini_empty");
 
   const parsed = JSON.parse(text);
   return {
