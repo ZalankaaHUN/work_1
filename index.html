@@ -958,13 +958,14 @@
           /* 3. swap the view while strips are covering the screen */
           swap();
           window.scrollTo({top:0,behavior:"auto"});
-          /* 4. sweep OUT */
+          /* 4. sweep OUT — keep "rev" class on until fully done */
           wipe.classList.remove("in");
           wipe.classList.add("out");
           setTimeout(function(){
+            /* only now safe to reset everything */
             wipe.className = "wipe";
             wiping = false;
-          }, 580);
+          }, 700);
         }, 520);
       });
     });
