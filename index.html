@@ -4,8 +4,14 @@
   Why one file: the form is a full-screen VIEW toggled in-page, so every
   button works in any environment with no broken links between pages.
 
-  EMAIL DELIVERY (form): submissions go to STUDIO_EMAIL (hello@webstrakt.com)
-  via FormSubmit. First live submission triggers a one-time confirmation email.
+  EMAIL DELIVERY (form): submissions post to /api/review-submission (a Vercel
+  serverless function — see /api/review-submission.js). That function asks
+  gpt-4o-mini to summarise the enquiry, flag missing info, suggest a plan/
+  budget fit and draft a reply, then forwards the submission + that review to
+  STUDIO_EMAIL (hello@webstrakt.com) via FormSubmit. Requires an
+  OPENAI_API_KEY environment variable set in the Vercel project — see
+  /SETUP.md. If the AI step fails for any reason the raw enquiry still gets
+  forwarded, just without the review, so no lead is ever lost.
 
   EN/HU toggle: English default. All copy lives in the DICT object near the end.
 
@@ -1162,7 +1168,7 @@
 
   /* ---------- form submit (FormSubmit — no account needed) ---------- */
   var STUDIO_EMAIL = "hello@webstrakt.com";
-  var ENDPOINT = "https://formsubmit.co/ajax/" + STUDIO_EMAIL;
+  var REVIEW_ENDPOINT = "/api/review-submission";
   var form = document.getElementById("projectForm");
   var status = document.getElementById("formStatus");
   var submitBtn = document.getElementById("sendBtn");
@@ -1220,15 +1226,13 @@
     var payload = {
       name: g("name"), email: g("email"), company: g("company"),
       type: g("type"), budget: g("budget"), subservice: g("subservice"), subtype: g("subtype"), timeline: g("timeline"),
-      message: g("message"),
-      _subject: "New project enquiry — " + (g("name") || "Webstrakt"),
-      _replyto: g("email"), _captcha: "false", _template: "table"
+      message: g("message")
     };
 
     var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
-    var timer = setTimeout(function(){ if(ctrl) ctrl.abort(); }, 10000);
+    var timer = setTimeout(function(){ if(ctrl) ctrl.abort(); }, 20000);
 
-    fetch(ENDPOINT, {
+    fetch(REVIEW_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
       body: JSON.stringify(payload),
