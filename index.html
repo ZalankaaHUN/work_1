@@ -946,28 +946,38 @@
     if(!wipe || window.matchMedia("(prefers-reduced-motion: reduce)").matches){ swap(); return; }
     if(wiping) return;
     wiping = true;
-    wipe.classList.remove("in","out","rev");
-    if(reverse){ wipe.classList.add("rev"); }
-    void wipe.offsetWidth;
-    wipe.classList.add("in");
-    setTimeout(function(){
-      swap();
-      wipe.classList.remove("in");
-      void wipe.offsetWidth;
-      wipe.classList.add("out");
-      setTimeout(function(){ wipe.classList.remove("out","rev"); wiping = false; }, 580);
-    }, 500);
+    /* 1. hard-reset all classes so strips are offscreen */
+    wipe.className = "wipe" + (reverse ? " rev" : "");
+    /* 2. wait one frame so the reset paints, then sweep IN */
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        wipe.classList.add("in");
+        setTimeout(function(){
+          /* 3. swap the view while strips are covering the screen */
+          swap();
+          window.scrollTo({top:0,behavior:"auto"});
+          /* 4. sweep OUT */
+          wipe.classList.remove("in");
+          wipe.classList.add("out");
+          setTimeout(function(){
+            wipe.className = "wipe";
+            wiping = false;
+          }, 580);
+        }, 520);
+      });
+    });
   }
-  function _showStart(){ document.body.classList.add("show-start"); overlay.classList.remove("open"); window.scrollTo({top:0,behavior:"auto"}); }
+  function _showStart(){ document.body.classList.add("show-start"); overlay.classList.remove("open"); }
   function _showHome(scrollSel){
     document.body.classList.remove("show-start"); overlay.classList.remove("open");
     if(scrollSel && scrollSel !== "#top"){
       var t = document.querySelector(scrollSel);
       if(t){ requestAnimationFrame(function(){ window.scrollTo({top:t.getBoundingClientRect().top + window.scrollY - 76, behavior:"smooth"}); }); return; }
     }
-    window.scrollTo({top:0,behavior:"smooth"});
   }
+  /* "Start project" → strips enter from left, exit to right */
   function showStart(){ if(document.body.classList.contains("show-start")) return; runWipe(_showStart, false); }
+  /* "Back to home"  → strips enter from right, exit to left */
   function showHome(scrollSel){ if(!document.body.classList.contains("show-start")){ _showHome(scrollSel); return; } runWipe(function(){ _showHome(scrollSel); }, true); }
 
   document.querySelectorAll('[data-go="start"]').forEach(function(el){
