@@ -406,12 +406,10 @@
   .wipe.in i:nth-child(2), .wipe.out i:nth-child(2){ transition-delay:.05s; }
   .wipe.in i:nth-child(3), .wipe.out i:nth-child(3){ transition-delay:.1s; }
   .wipe.in i:nth-child(4), .wipe.out i:nth-child(4){ transition-delay:.15s; }
-  /* reverse direction — used when leaving "Start a project" back to home */
+  /* reverse direction — used when leaving "Start a project" back to home, so the
+     sweep enters from the right and exits to the left (mirror of the forward wipe) */
   .wipe.rev i{ transform:translateX(101%); }
-  .wipe.rev.out i{ transition:transform .38s var(--ease); transform:translateX(-101%); }
-  .wipe.rev.out i:nth-child(2){ transition-delay:.05s; }
-  .wipe.rev.out i:nth-child(3){ transition-delay:.1s; }
-  .wipe.rev.out i:nth-child(4){ transition-delay:.15s; }
+  .wipe.rev.out i{ transform:translateX(-101%); }
 
   @media (prefers-reduced-motion:reduce){ *{ animation:none !important; transition:none !important; } .reveal,.reveal-load{ opacity:1 !important; transform:none !important; } .hero h1 em{ background-size:100% .13em; } .spine .lbl{ opacity:1; transform:none; } }
 
@@ -945,42 +943,26 @@
   var overlay = document.getElementById("overlay");
   var wipe = document.getElementById("wipe"), wiping = false;
   function runWipe(swap, reverse){
-    if(!wipe || window.matchMedia("(prefers-reduced-motion: reduce)").matches){ swap(); return; }
-    if(wiping) return;
+    if(!wipe || wiping || window.matchMedia("(prefers-reduced-motion: reduce)").matches){ swap(); return; }
     wiping = true;
-    /* 1. hard-reset all classes so strips are offscreen */
-    wipe.className = "wipe" + (reverse ? " rev" : "");
-    /* 2. wait one frame so the reset paints, then sweep IN */
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){
-        wipe.classList.add("in");
-        setTimeout(function(){
-          /* 3. swap the view while strips are covering the screen */
-          swap();
-          window.scrollTo({top:0,behavior:"auto"});
-          /* 4. sweep OUT — keep "rev" class on until fully done */
-          wipe.classList.remove("in");
-          wipe.classList.add("out");
-          setTimeout(function(){
-            /* only now safe to reset everything */
-            wipe.className = "wipe";
-            wiping = false;
-          }, 700);
-        }, 520);
-      });
-    });
+    wipe.classList.toggle("rev", !!reverse);
+    wipe.classList.remove("out"); wipe.classList.add("in");
+    setTimeout(function(){
+      swap();
+      wipe.classList.remove("in"); wipe.classList.add("out");
+      setTimeout(function(){ wipe.classList.remove("out"); wiping = false; }, 580);
+    }, 500);
   }
-  function _showStart(){ document.body.classList.add("show-start"); overlay.classList.remove("open"); }
+  function _showStart(){ document.body.classList.add("show-start"); overlay.classList.remove("open"); window.scrollTo({top:0,behavior:"auto"}); }
   function _showHome(scrollSel){
     document.body.classList.remove("show-start"); overlay.classList.remove("open");
     if(scrollSel && scrollSel !== "#top"){
       var t = document.querySelector(scrollSel);
       if(t){ requestAnimationFrame(function(){ window.scrollTo({top:t.getBoundingClientRect().top + window.scrollY - 76, behavior:"smooth"}); }); return; }
     }
+    window.scrollTo({top:0,behavior:"smooth"});
   }
-  /* "Start project" → strips enter from left, exit to right */
-  function showStart(){ if(document.body.classList.contains("show-start")) return; runWipe(_showStart, false); }
-  /* "Back to home"  → strips enter from right, exit to left */
+  function showStart(){ if(document.body.classList.contains("show-start")){ _showStart(); return; } runWipe(_showStart, false); }
   function showHome(scrollSel){ if(!document.body.classList.contains("show-start")){ _showHome(scrollSel); return; } runWipe(function(){ _showHome(scrollSel); }, true); }
 
   document.querySelectorAll('[data-go="start"]').forEach(function(el){
