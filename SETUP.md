@@ -2,8 +2,8 @@
 
 This adds one serverless function (`/api/review-submission.js`) that runs on
 Vercel. It sits between the "Start a project" form and your inbox: every
-submission gets reviewed by gpt-4o-mini (summary, missing info, plan fit,
-draft reply) before the email reaches hello@webstrakt.com.
+submission gets reviewed by Gemini (summary, missing info, plan fit, draft
+reply) before the email reaches hello@webstrakt.com.
 
 ## What changed
 
@@ -26,9 +26,11 @@ draft reply) before the email reaches hello@webstrakt.com.
      step needed). Leave build/output settings blank.
    - Deploy.
 
-3. **Add your OpenAI key as an environment variable**:
+3. **Get a Gemini API key and add it as an environment variable**:
+   - Get a key at aistudio.google.com/apikey (sign in with a Google account,
+     click "Create API key").
    - In the Vercel project → Settings → Environment Variables.
-   - Add `OPENAI_API_KEY` with your `sk-...` key.
+   - Add `GEMINI_API_KEY` with that key.
    - Apply it to Production (and Preview, if you want AI review on preview
      deploys too).
    - Redeploy after adding it (env vars only apply to new deployments).
@@ -39,10 +41,12 @@ draft reply) before the email reaches hello@webstrakt.com.
 
 ## Notes
 
-- If the OpenAI call fails for any reason (no key yet, rate limit, etc.), the
+- If the Gemini call fails for any reason (no key yet, rate limit, etc.), the
   function still forwards the raw enquiry — you just won't see the AI review
   section for that one. Nothing is ever silently dropped.
 - This reuses your existing FormSubmit destination (hello@webstrakt.com), so
   there's no new email service to sign up for.
-- Cost: gpt-4o-mini is inexpensive per request; a typical enquiry review
-  should cost a small fraction of a cent.
+- The function uses `gemini-2.5-flash`, a fast and inexpensive model — a
+  typical enquiry review should cost a small fraction of a cent. You can swap
+  the model string at the top of `review-submission.js` if you'd rather use a
+  different Gemini model.
