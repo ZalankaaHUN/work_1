@@ -406,10 +406,12 @@
   .wipe.in i:nth-child(2), .wipe.out i:nth-child(2){ transition-delay:.05s; }
   .wipe.in i:nth-child(3), .wipe.out i:nth-child(3){ transition-delay:.1s; }
   .wipe.in i:nth-child(4), .wipe.out i:nth-child(4){ transition-delay:.15s; }
-  /* reverse direction — used when leaving "Start a project" back to home, so the
-     sweep enters from the right and exits to the left (mirror of the forward wipe) */
+  /* reverse direction — used when leaving "Start a project" back to home */
   .wipe.rev i{ transform:translateX(101%); }
-  .wipe.rev.out i{ transform:translateX(-101%); }
+  .wipe.rev.out i{ transition:transform .38s var(--ease); transform:translateX(-101%); }
+  .wipe.rev.out i:nth-child(2){ transition-delay:.05s; }
+  .wipe.rev.out i:nth-child(3){ transition-delay:.1s; }
+  .wipe.rev.out i:nth-child(4){ transition-delay:.15s; }
 
   @media (prefers-reduced-motion:reduce){ *{ animation:none !important; transition:none !important; } .reveal,.reveal-load{ opacity:1 !important; transform:none !important; } .hero h1 em{ background-size:100% .13em; } .spine .lbl{ opacity:1; transform:none; } }
 
