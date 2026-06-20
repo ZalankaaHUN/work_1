@@ -406,6 +406,10 @@
   .wipe.in i:nth-child(2), .wipe.out i:nth-child(2){ transition-delay:.05s; }
   .wipe.in i:nth-child(3), .wipe.out i:nth-child(3){ transition-delay:.1s; }
   .wipe.in i:nth-child(4), .wipe.out i:nth-child(4){ transition-delay:.15s; }
+  /* reverse direction — used when leaving "Start a project" back to home, so the
+     sweep enters from the right and exits to the left (mirror of the forward wipe) */
+  .wipe.rev i{ transform:translateX(101%); }
+  .wipe.rev.out i{ transform:translateX(-101%); }
 
   @media (prefers-reduced-motion:reduce){ *{ animation:none !important; transition:none !important; } .reveal,.reveal-load{ opacity:1 !important; transform:none !important; } .hero h1 em{ background-size:100% .13em; } .spine .lbl{ opacity:1; transform:none; } }
 
@@ -938,9 +942,10 @@
   /* ---------- view switching (home <-> start), wrapped in the strata wipe ---------- */
   var overlay = document.getElementById("overlay");
   var wipe = document.getElementById("wipe"), wiping = false;
-  function runWipe(swap){
+  function runWipe(swap, reverse){
     if(!wipe || wiping || window.matchMedia("(prefers-reduced-motion: reduce)").matches){ swap(); return; }
     wiping = true;
+    wipe.classList.toggle("rev", !!reverse);
     wipe.classList.remove("out"); wipe.classList.add("in");
     setTimeout(function(){
       swap();
@@ -957,8 +962,8 @@
     }
     window.scrollTo({top:0,behavior:"smooth"});
   }
-  function showStart(){ if(document.body.classList.contains("show-start")){ _showStart(); return; } runWipe(_showStart); }
-  function showHome(scrollSel){ if(!document.body.classList.contains("show-start")){ _showHome(scrollSel); return; } runWipe(function(){ _showHome(scrollSel); }); }
+  function showStart(){ if(document.body.classList.contains("show-start")){ _showStart(); return; } runWipe(_showStart, false); }
+  function showHome(scrollSel){ if(!document.body.classList.contains("show-start")){ _showHome(scrollSel); return; } runWipe(function(){ _showHome(scrollSel); }, true); }
 
   document.querySelectorAll('[data-go="start"]').forEach(function(el){
     el.addEventListener("click", function(e){ e.preventDefault(); showStart(); });
