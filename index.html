@@ -6,10 +6,10 @@
 
   EMAIL DELIVERY (form): submissions post to /api/review-submission (a Vercel
   serverless function — see /api/review-submission.js). That function asks
-  gpt-4o-mini to summarise the enquiry, flag missing info, suggest a plan/
-  budget fit and draft a reply, then forwards the submission + that review to
-  STUDIO_EMAIL (hello@webstrakt.com) via FormSubmit. Requires an
-  OPENAI_API_KEY environment variable set in the Vercel project — see
+  Gemini (gemini-2.5-flash) to summarise the enquiry, flag missing info,
+  suggest a plan/budget fit and draft a reply, then forwards the submission +
+  that review to STUDIO_EMAIL (hello@webstrakt.com) via FormSubmit. Requires a
+  GEMINI_API_KEY environment variable set in the Vercel project — see
   /SETUP.md. If the AI step fails for any reason the raw enquiry still gets
   forwarded, just without the review, so no lead is ever lost.
 
